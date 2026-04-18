@@ -5,21 +5,23 @@ Updated by: Claude Chat (migration session)
 
 ## Current focus
 
-**CB-DECAY-MONITOR gate — Apr 18 evening.** Needs 300–400 paper fills to evaluate
-post-cull WR. Determine if surviving wallets can generate non-NOISE_BET-compatible
-volume. Options: loosen threshold, restore compatible demoted wallets, or declare
-cull failed.
+**CB-DECAY-MONITOR gate — Apr 18 evening.** Volume question resolved:
+516 PAPER fills in the last 24h alone demonstrates the surviving wallet
+pool is generating more than enough signal throughput post-cull. Gate
+question narrows to: **is the 63% WR from Apr 17 (194W/112L, n=306)
+holding on post-Apr-17 data, or has it regressed?**
 
-As of Apr 17 evening: 306 settled trades, 194W/112L, 63% WR, +$75.51 paper P&L.
-95.7% of pre-cull edge concentrated in wallets the Apr 13 cull removed or demoted.
-Only 1 of top 20 pre-cull earners still active T2. Wallet-selection bug, not
-strategy failure. Candidate action: selective restore of 8 top-20 wallets with
-n≥3 and WR≥80%.
+As of Apr 18 10:48 UTC: 413 fills / 120 settled / 68W 52L / WR 56.7% in the
+trailing 24h. That's a meaningful drop from 63% and n=120 is enough to take
+seriously but not enough to be decisive. Decision: let the 02:00 UTC
+harvester run tonight, then evaluate the full Apr 17–18 post-cull cohort
+against the pre-cull top-20 restore candidates. Gate eval session tonight
+or tomorrow morning depending on data freshness.
 
 ## Open tasks by bot
 
 ### CopyBot
-- [ ] Evaluate CB-DECAY-MONITOR gate (this evening, Apr 18)
+- [ ] Evaluate CB-DECAY-MONITOR gate — post 02:00 UTC harvester, Apr 18 evening or Apr 19 morning
 - [ ] Sunday 06:00 UTC auto-rescore applies corrected BUY+SELL pair metric to all 809 T2 wallets (CB-WATCHLIST-STALE fix)
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats
 

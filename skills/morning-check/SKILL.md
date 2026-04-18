@@ -1,6 +1,6 @@
 ---
 name: morning-check
-version: 2026-04-18
+version: 2026-04-18b
 triggers: ["morning check", "morning brief", "status", "where are we"]
 tools: [bash, grep]
 preconditions: []
@@ -16,20 +16,70 @@ No prose explanations until asked — numbers first, context second.
 
 1. **Time and day.** Print current UTC and local (Weert/CET).
 
-2. **Bot service health.** For each active bot service:
+2. **Bot service health.** Core services must be active; sibling services
+   (dashboards, watchdogs, settlers) are checked but do not fail the brief
+   if they are down — only note them under `🟡 Siblings`.
    ```
-   for svc in copybot-sports weatherbot krajekbot newsbot; do
-     echo "=== $svc ==="
-     systemctl is-active $svc
-     journalctl -u $svc --since "1 hour ago" -n 3 --no-pager
-   done
+   CORE="copybot-sports krajekbot weatherbot-scanner newsbot-pipeline"
+   SIBLINGS="copybot-dashboard copybot-stream copybot-watchdog polybot-harvester \
+             krajekbot-dashboard krajekbot-dashboard-gen krajekbot-settler \
+             weatherbot-dashboard weatherbot-watchdog \
+             newsbot-dashboard scoutbot-dashboard"
+   for svc in $CORE;     do echo "CORE  $svc: $(systemctl is-active $svc)"; done
+   for svc in $SIBLINGS; do echo "SIB   $svc: $(systemctl is-active $svc)"; done
+   # Only journalctl -u <svc> --since "1 hour ago" -n 3 if a CORE svc is not active.
    ```
 
-3. **CopyBot quick snapshot** (most active bot, check first):
-   - Last paper fill timestamp: `tail -1 /opt/copybot/data/sports_signals.jsonl | python3 -c "import sys,json; d=json.loads(sys.stdin.read()); print(d.get('ts',''), d.get('status',''))"`
-   - Paper settled last 24h: W/L/WR + P&L
-   - Open positions: `wc -l /opt/copybot/data/open_positions.jsonl`
-   - USDC balance (Polygonscan for ground truth if manual transfer suspected)
+3. **CopyBot snapshot** (most active; check first). Source of truth is
+   `/opt/copybot/data/sports_signals.jsonl` — append-only log where
+   `event:"SIGNAL"` records are fills and `event:"RESOLVED"` records are
+   settlements carrying `won` (bool) and `pnl` (float USD). There is no
+   separate settled file. The 02:30 UTC `outcome_harvester_*.log` is the
+   wallet-leaderboard scanner — ignore it for paper P&L. USDC balance:
+   check Polygonscan only if manual transfer suspected.
+
+Run this block (kept at column 0 so the heredoc terminator `PY` parses
+cleanly in both shell and the SKILL verifier):
+
+```
+python3 - <<'PY'
+import json
+from datetime import datetime, timezone, timedelta
+cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+fills = settled = wins = 0
+pnl = 0.0
+last_fill_ts = last_resolve_ts = ""
+with open('/opt/copybot/data/sports_signals.jsonl') as f:
+    for line in f:
+        try:
+            d = json.loads(line)
+        except Exception:
+            continue
+        ts_str = d.get('ts') or d.get('timestamp') or ""
+        try:
+            ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
+        except Exception:
+            continue
+        if ts < cutoff:
+            continue
+        ev = d.get('event')
+        if ev == 'SIGNAL' and d.get('status') == 'PAPER':
+            fills += 1
+            if ts_str > last_fill_ts:
+                last_fill_ts = ts_str
+        elif ev == 'RESOLVED':
+            settled += 1
+            if d.get('won'):
+                wins += 1
+            pnl += d.get('pnl', 0) or 0
+            if ts_str > last_resolve_ts:
+                last_resolve_ts = ts_str
+wr = 100 * wins / settled if settled else 0
+print(f"fills_24h={fills}  settled_24h={settled}  wins={wins}  losses={settled-wins}  WR={wr:.1f}%  pnl=${pnl:+.2f}")
+print(f"last_fill={last_fill_ts}  last_resolve={last_resolve_ts}")
+PY
+wc -l /opt/copybot/data/sports_positions.json   # open-position map (by order_id)
+```
 
 4. **KrajekBot re-paper progress:**
    - Trade count since last restart
@@ -60,10 +110,11 @@ No prose explanations until asked — numbers first, context second.
 ```
 ===== Morning Brief — YYYY-MM-DD HH:MM UTC =====
 
-🟢 Services: copybot-sports WeatherBot krajekbot newsbot  (all active)
-🔴 Down: [list if any]
+🟢 Core:     copybot-sports  krajekbot  weatherbot-scanner  newsbot-pipeline
+🟡 Siblings: [list only those NOT active]
+🔴 Down:     [core services not active]
 
-CopyBot paper:  last 24h  WwLl (X%)  +$YY.YY  |  Open: N  |  Last fill: HH:MM
+CopyBot paper:  24h  fills=NNN  settled=W/L (WR%)  pnl=$±X.XX  |  Open: N  |  Last fill: HH:MM
 KrajekBot:      N trades since restart  |  WR Z%  |  Target: 300 (remaining: M)
 WeatherBot:     Day K/14 WB-28 verification  |  Filter pass rate: X%
 NewsBot:        N signals today  |  $0.XX spent  |  Settled: 0/121 (gate blocker)
@@ -79,6 +130,7 @@ ScoutBot:       K priority items overnight
 - Don't restart anything (constraint: read-only).
 - Don't update WORKSPACE.md from this skill — that's explicit.
 - If numbers surprise you, report them flatly. Don't speculate on cause until asked.
+- Don't confuse the leaderboard outcome_harvester (02:30 UTC, shadow_outcomes.jsonl, wallet-scanning) with paper settlement events (inline in sports_signals.jsonl, written continuously by copybot-sports).
 
 ## Self-rewrite trigger
 
