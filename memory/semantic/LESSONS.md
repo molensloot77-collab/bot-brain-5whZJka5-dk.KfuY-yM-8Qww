@@ -53,3 +53,23 @@ tagged with date.
 - NEVER ask to update handovers mid-session. Evening routine owns all handover updates.
 - Every Claude Code session prompt includes Task 0: grep today's SCT-AUTO items.
 - Code files delivered via `present_files` only. Session prompts as direct copy blocks.
+
+## Skill-authoring
+
+- **Shell heredocs inside skill markdown must not live inside list items.**
+  Markdown list indentation (3-space) corrupts heredoc termination
+  (closing `PY` with leading spaces doesn't terminate) and breaks embedded
+  Python (IndentationError at module level from the list prefix). Keep
+  code fences at column 0, reference them from the list. Example: a
+  numbered step reading "3. See block below" with a column-0 code fence
+  underneath works cleanly; a code fence indented to sit "inside" the
+  numbered item does not.
+- **Verify every embedded code block on first write.** If a SKILL.md
+  contains embedded Python or shell, run a one-shot parse check before
+  trusting the file. Compile-check Python with `compile(code, '<name>', 'exec')`;
+  dry-run shell with `bash -n`. Surfaced 2026-04-18 on morning-check
+  v2026-04-18b.
+- **Real data invalidates proposed output formats.** First run of
+  morning-check showed the output template was anchored on a non-existent
+  `paper_settled.jsonl`. Always trace the skill's data assumptions to real
+  files in the first run, not the first-draft review.
