@@ -1,6 +1,6 @@
 ---
 name: morning-check
-version: 2026-04-18b
+version: 2026-04-18c
 triggers: ["morning check", "morning brief", "status", "where are we"]
 tools: [bash, grep]
 preconditions: []
@@ -82,18 +82,26 @@ wc -l /opt/copybot/data/sports_positions.json   # open-position map (by order_id
 ```
 
 4. **KrajekBot re-paper progress:**
-   - Trade count since last restart
-   - v4.6 target remaining (300 minimum)
-   - Last regime flag
+   - Live trade count: `wc -l /root/PM_Krajek/trades/live_trades.jsonl`
+     (target: 300+ v4.6 trades before live redeployment decision)
+   - Last regime flag: `journalctl -u krajekbot -n 50 --no-pager | grep -iE "regime|CROWD" | tail -3`
+   - Uptime since last restart: `systemctl show krajekbot -p ActiveEnterTimestamp --value`
+   - NOTE: `/root/PM_Krajek/trades/backtest_results_*.jsonl` are backtest
+     cache, NOT live/paper trades — ignore for progress count.
 
 5. **WeatherBot WB-28 verification days elapsed:**
    - Days since WB-28 filter activated
    - Gate: Apr 22 (14-day verification completes)
 
 6. **NewsBot paper gate:**
-   - Signals today: `grep "$(date -u +%F)" /opt/newsbot/data/signals.jsonl | wc -l`
-   - Cost today: `grep "$(date -u +%F)" /opt/newsbot/logs/classifier.log | grep -i cost`
-   - Settled count (May 7 gate blocker)
+   - Gate snapshot (authoritative): `cat /opt/newsbot/data/gate_status.json`
+     reports days_elapsed, gate_score/gate_total, per-threshold PASS/PEND/FAIL,
+     kill_gate_triggered, metrics (signals, trades, win_rate, latency, edge).
+   - Cost today: `cat /opt/newsbot/data/api_cost_counter.json`
+   - Actionable trade rate in brief: report as `N/M PASS (pending: X)` where
+     X is thresholds_pending from gate_status.
+   - Gate is May 7 extended (not Apr 22) due to Polymarket resolution lag;
+     win_rate will remain PEND until first settled trade window (Apr 30 earliest).
 
 7. **ScoutBot overnight priority items:**
    - `grep "$(date -u +%F)" /root/docs/AllBots_TODO_CURRENT.md | grep SCT-AUTO | head -10`
@@ -131,6 +139,7 @@ ScoutBot:       K priority items overnight
 - Don't update WORKSPACE.md from this skill — that's explicit.
 - If numbers surprise you, report them flatly. Don't speculate on cause until asked.
 - Don't confuse the leaderboard outcome_harvester (02:30 UTC, shadow_outcomes.jsonl, wallet-scanning) with paper settlement events (inline in sports_signals.jsonl, written continuously by copybot-sports).
+- Don't chase `/opt/newsbot/data/signals.jsonl` or `classifier.log` for gate status — read `gate_status.json` directly, it is the authoritative pre-computed snapshot.
 
 ## Self-rewrite trigger
 

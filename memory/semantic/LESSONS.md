@@ -57,19 +57,22 @@ tagged with date.
 ## Skill-authoring
 
 - **Shell heredocs inside skill markdown must not live inside list items.**
-  Markdown list indentation (3-space) corrupts heredoc termination
-  (closing `PY` with leading spaces doesn't terminate) and breaks embedded
-  Python (IndentationError at module level from the list prefix). Keep
-  code fences at column 0, reference them from the list. Example: a
-  numbered step reading "3. See block below" with a column-0 code fence
-  underneath works cleanly; a code fence indented to sit "inside" the
-  numbered item does not.
+  Markdown list indentation (3-space) corrupts heredoc termination (closing
+  `PY` with leading spaces doesn't terminate) and breaks embedded Python
+  (IndentationError at module level from the list prefix). Keep code fences
+  at column 0; reference them from the list. Surfaced 2026-04-18 on
+  morning-check v2026-04-18b.
 - **Verify every embedded code block on first write.** If a SKILL.md
   contains embedded Python or shell, run a one-shot parse check before
   trusting the file. Compile-check Python with `compile(code, '<name>', 'exec')`;
-  dry-run shell with `bash -n`. Surfaced 2026-04-18 on morning-check
-  v2026-04-18b.
+  dry-run shell with `bash -n`.
 - **Real data invalidates proposed output formats.** First run of
   morning-check showed the output template was anchored on a non-existent
   `paper_settled.jsonl`. Always trace the skill's data assumptions to real
-  files in the first run, not the first-draft review.
+  files in the first run, not first-draft review. CopyBot settled lives
+  inline in `sports_signals.jsonl` as RESOLVED events; no separate file.
+- **Let Claude Code's improvisation teach the skill.** When a skill
+  underspecifies a data source and Claude Code finds a better one at
+  runtime (e.g. NewsBot `gate_status.json` over raw signals.jsonl grep),
+  promote the discovery into the next skill version rather than leaving
+  the skill to re-discover on every run.
