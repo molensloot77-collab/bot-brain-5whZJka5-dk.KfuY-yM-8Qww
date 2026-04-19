@@ -26,9 +26,7 @@ or tomorrow morning depending on data freshness.
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats
 
 ### KrajekBot
-- [ ] Apr 23 gate (or May 7 if regime check fails): KR-FUND live deployment decision
-- [ ] Regime check: if <10% of days show CROWD_SHORT, extend gate to May 7
-- [ ] Post-re-paper: KR-STAGE1-FILTER remediation (SHADOW_LATE masks Stage-2 skips)
+- RETIRED 2026-04-19. See /root/PM_Krajek/RETIRED.md and FALSIFIED.md.
 
 ### NewsBot
 - [ ] May 7 extended go/no-go gate (was Apr 22 — extended due to 0 settled trades)
@@ -60,7 +58,6 @@ or tomorrow morning depending on data freshness.
 
 - NewsBot gate: blocked on Polymarket resolution lag (0/121 settled, Apr 30 cohort is first realistic window)
 - WeatherBot WB-RESUME: blocked until 14-day WB-28 verification completes (~Apr 22)
-- KrajekBot KR-FUND: blocked until Apr 23 regime check
 
 ## Session conventions
 
