@@ -22,6 +22,8 @@ or tomorrow morning depending on data freshness.
 
 ### CopyBot
 - [ ] Evaluate CB-DECAY-MONITOR gate — post 02:00 UTC harvester, Apr 18 evening or Apr 19 morning
+- [ ] CB-EXIT-MIRROR — measure source-wallet exit behavior, sequence after polling-fix 24-48h data
+- [ ] CB-SCORE-RESOLVED-ONLY — audit + correct scoring to exclude unresolved-as-wins, sequence after polling-fix 48-72h data
 - [ ] Sunday 06:00 UTC auto-rescore applies corrected BUY+SELL pair metric to all 809 T2 wallets (CB-WATCHLIST-STALE fix)
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats
 
