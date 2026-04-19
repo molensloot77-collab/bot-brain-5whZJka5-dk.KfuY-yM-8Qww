@@ -16,6 +16,12 @@ Evaluate a paper gate against its pre-committed metrics. (Placeholder — to be 
 when the first gate evaluation session uses it; the shape will emerge from the real workflow.)
 **Triggers:** "gate", "evaluate gate", "gate eval", "go/no-go"
 
+## strategic-review
+Weekly triage of ScoutBot threads + FALSIFIED.md cross-reference. Produces a
+single page with pattern, mechanism, upside estimate, cost-to-test, and first
+step per surviving thread. Does NOT decide, backtest, or project — pure triage.
+**Triggers:** "strategic review", "review threads", "what's worth doing", "weekly review"
+
 ## Adding a new skill
 
 When a workflow has been repeated 3+ times with the same structure, migrate it here:
