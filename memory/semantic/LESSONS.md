@@ -76,3 +76,29 @@ tagged with date.
   runtime (e.g. NewsBot `gate_status.json` over raw signals.jsonl grep),
   promote the discovery into the next skill version rather than leaving
   the skill to re-discover on every run.
+
+## Pipeline observations
+
+- **ScoutBot recycles falsified categories.** First strategic-review run
+  (2026-04-19) showed 14+ PolyArb-mechanism items still being promoted
+  at scores 7.0-8.8, plus Kalshi crypto-up/down integrations and
+  market-making variants. The strategic-review skill's FALSIFIED.md
+  cross-reference correctly skipped them, but their continued generation
+  means ScoutBot's hypothesis space is too narrow — it lacks awareness
+  of which categories have been killed. Layer 0 (idea generation) needs
+  work alongside Layer 1 (triage).
+
+- **Future skill candidate: scout-quality-audit.** Measures what % of
+  SCT-AUTO items per week would be killed by FALSIFIED.md cross-reference,
+  and surfaces the specific falsified categories ScoutBot keeps revisiting.
+  Output: a brief weekly note like "this week ScoutBot promoted 18 items
+  in already-falsified PolyArb-mechanism category — consider adding
+  category-blacklist to ScoutBot scoring." Build only if 3+ weekly
+  strategic-review runs continue showing >20% kill rate.
+
+- **Pipeline-progression discipline (from strategic-review build, 2026-04-19):**
+  Build Layer 1 (triage) before Layer 2 (backtest) before Layer 3
+  (gate). Each layer's output must prove useful for 2-3 cycles before
+  building the next layer. Resist the holy-grail "one prompt does
+  everything" temptation — pipelines that promise to find/test/decide
+  autonomously produce confident-sounding outputs that are wrong.

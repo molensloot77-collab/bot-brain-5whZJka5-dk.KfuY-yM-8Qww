@@ -113,10 +113,23 @@ For each surviving thread (cap 5):
 
 ### 6. Sort and cap
 
-Sort surviving threads by `(upside × prob_estimate) / cost`. When upside is
-"unknown", rank on `prob_estimate / cost` alone and mark the thread as
-"upside-unknown" in the sort column. Cap at 5. Show the ranking math openly
-so BigW can re-rank.
+Sort surviving threads by `(upside × prob_estimate) / cost` DESCENDING.
+Cap at 5 threads. Show the ranking math openly so BigW can re-rank.
+
+**Ordering convention (strict):**
+- Rank 1 = highest score (best triage candidate)
+- Table rows MUST be in score-descending order
+- Any "apparent rank" prose line MUST use the table's row order directly
+  — DO NOT re-derive ranking from the same numbers a second time
+- For threads with `upside-unknown`, score on `prob / cost` and label
+  the row `upside-unknown` in the Notes column. Place these in the
+  ranking using their `prob/cost` value but flag clearly.
+
+**Self-check before writing the doc:**
+- The thread at rank 1 must have the numerically highest score in the table
+- The "Apparent rank by formula" line (if produced) must list thread numbers
+  in the same order as the table rows
+- If those two checks disagree, STOP and fix before output
 
 ### 7. Output file
 
