@@ -1,0 +1,72 @@
+# Workspace — Live Task State
+
+Last updated: 2026-04-20 (Monday, morning session)
+Updated by: Claude Code (CB-DECAY gate eval)
+
+## Current focus
+
+**CB-DECAY-MONITOR gate — resolved Apr 20.** Apr 17+ paper cohort
+(n=416, 66 wallets): 210W/206L = 50.5% WR, -$7.58. Bi-modal split —
+13 wallets carry +$19.62 of edge, 14 wallets bleed -$22.38. Apr 17's
+61% WR was a one-day restore-batch pop, not a stable baseline.
+
+Action taken: surgical demote of 4 bleeders (n>=10, WR<42%, neg PnL,
+aggregate -$10.58) to WATCHLIST_ONLY. Commit e6dbce3, post-restart
+CB-TIER: 129/162 copy_enabled (133→129). Expected cohort lift
+50.5% → ~53%. Re-eval 2026-04-25 to 2026-04-27.
+
+Hold on broader action — restore-candidate list saturated per
+T1/T2 postmortems (2026-04-18), cohort not in free-fall.
+
+## Open tasks by bot
+
+### CopyBot
+- [ ] CB-DECAY-MONITOR re-eval ~2026-04-25 — verify ~53% WR lift holds post-demote-4 (commit e6dbce3)
+- [ ] CB-WATCHLIST-DRIFT-AUDIT — investigate who/what pruned sports_watchlist.json from 2257→162 entries between Apr 15 and Apr 17, why commit was skipped. Candidates: watchlist_validator.py auto-prune, rescore_watchlist.py, manual session action. Trigger: before next watchlist write. See /opt/copybot/logs/INVESTIGATION_2026-04-20_watchlist_drift.md.
+- [ ] HUB-ORPHAN-AUDIT — investigate /opt/hub/ contents. Which files are actively consumed (systemd unit, cron, Python import), which are orphaned, which were duplicated at some point (e.g., /opt/hub/healthcheck.py vs. live /root/healthcheck.py). Resolution: either delete orphans or document why they're retained. Trigger: before next /opt/hub/ edit, or as standalone maintenance task.
+- [ ] CB-MARTINGALE-WATCH-0x8a81855d — wallet is "DO NOT RESTORE, on-chain -$32K Martingale" per cull_restore_candidates.json, but currently in active T2 posting 77.3% WR n=22 +$1.80 on paper. Known "paper grind-up risk." Keep in T2, flag for max-drawdown watch. Re-evaluate trigger: n>=50 OR single-loss >$5.
+- [ ] CB-EXIT-MIRROR — measure source-wallet exit behavior, sequence after polling-fix 24-48h data
+- [ ] CB-SCORE-RESOLVED-ONLY — audit + correct scoring to exclude unresolved-as-wins, sequence after polling-fix 48-72h data
+- [ ] Sunday 06:00 UTC auto-rescore applies corrected BUY+SELL pair metric to all 809 T2 wallets (CB-WATCHLIST-STALE fix)
+- [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats
+
+### KrajekBot
+- RETIRED 2026-04-19. See /root/PM_Krajek/RETIRED.md and FALSIFIED.md.
+
+### NewsBot
+- [ ] May 7 extended go/no-go gate (was Apr 22 — extended due to 0 settled trades)
+- [ ] Fuzzy dedup fix (9.8% duplicate leak)
+- [ ] 30s burst debounce (48% calls <10s apart)
+- [ ] `datetime.utcnow()` deprecation fix in `pipeline.py:78`
+
+### WeatherBot
+- [ ] Apr 22 WB-RESUME go/no-go
+- [ ] Apr 22 WB-29 city divergence prior gate
+- [ ] WB-30 (paper_settler fix) — first task next WeatherBot session
+
+### ScoutBot
+- [ ] SCT-2 Reddit API approval still pending (submitted Mar 30)
+- [ ] Periodic bulk retirement of PolyArb-tagged SCT-AUTO items (~weekly)
+
+### Cross-cutting
+- [ ] Polymarket exchange migration monitoring (@PolymarketDevs) — CTF allowance re-approval needed post-migration on all bot wallets
+- [ ] SX Bet integration (CopyBot) — `sx_paper.jsonl` logging wired; review ~monthly
+
+## Recent decisions (last 7 days)
+
+- 2026-04-20: CB-DECAY-MONITOR gate — demote 4 bleeders (0xef185339 / 0x2c1bf2a1 / 0x5e59a357 / 0xe3084ecc). Cohort was 50.5% WR/-$7.58 with bi-modal split; Apr 17 "63%" was restore-batch pop. Commit e6dbce3. Baseline CB-TIER: 129/162.
+- 2026-04-17: CopyBot switched to 100% paper mode via systemd drop-in; 306 settled trades confirm wallet-selection cull was wrong
+- 2026-04-16: CB-NOISE-PAPER-BUG fixed (commit e60221f) — `bet_size = min(PAPER_BET_SIZE_USD, bet_size)`
+- 2026-04-15: CB-SIZING-FIX — 148/157 T2 wallets raised from stale $0.50 to $1.00 MIN_LIVE_BET_USD
+- 2026-04-13: CB-ASK-SORT critical bug fixed (commit 1e922c4) — `get_best_ask()` was returning worst ask for 19 days; 9 signals fired within 1 minute post-fix
+
+## Blocked / waiting
+
+- NewsBot gate: blocked on Polymarket resolution lag (0/121 settled, Apr 30 cohort is first realistic window)
+- WeatherBot WB-RESUME: blocked until 14-day WB-28 verification completes (~Apr 22)
+
+## Session conventions
+
+- Morning: read this file first, then run morning check skill
+- After any significant action: update "Open tasks" and "Recent decisions" here
+- Evening: append to `/root/.agent/memory/episodic/session_log.jsonl`, commit
