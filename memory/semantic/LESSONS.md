@@ -163,3 +163,82 @@ the sizing architecture regardless of correctness.
 - CB-BACKTEST-RES-TS: demote HIGH → MED. Not urgent until sizing fix.
 - CB-SIZING-OVERHAUL: TOP PRIORITY. Investigation before any code change.
 
+
+---
+
+## 2026-04-22 (late) — NOISE_BET validation correction + cascade pattern
+
+### Correction to earlier entry ("CopyBot execution audit: sizing ceiling")
+
+Earlier today I wrote that NOISE_BET "correctly discriminates losing bets"
+based on the observation that 832 NOISE_BET-tagged signals had source P&L
+of −$252K. That reasoning was wrong.
+
+**The methodology error:**
+The NOISE_BET filter fires on ~100% of CopyBot signals from Apr 6 onward.
+There is no non-firing control group. Claiming "NOISE_BET selects losers"
+from a sample where 100% of signals are labelled NOISE_BET is not a filter
+discrimination finding — it's just the time-distribution of the overall
+cohort's source P&L dressed up as filter performance.
+
+The −$252K loss was real. Its attribution to NOISE_BET was not. Source
+wallets lost money during Apr 13-22 regardless of tag, and 100% of signals
+in that window happen to be tagged NOISE_BET, so the loss appeared under
+the NOISE_BET bucket by definition.
+
+**The methodology lesson (reusable):**
+> Before evaluating a filter, verify the filter has a non-firing control
+> group of non-trivial size. If 0% or 100% of samples pass the filter, the
+> filter isn't filtering — it's labelling. You cannot measure discrimination
+> on a sample with no contrast.
+
+Specific check for any future filter validation: split the sample by
+filter-fired vs filter-not-fired, confirm both groups have n ≥ 30 on at
+least 3 distinct days, THEN compare outcomes. If either group is empty or
+temporally concentrated, the filter verdict is unreliable.
+
+**How the correction surfaced:**
+Three-cut time-split analysis on Apr 22 revealed NOISE_BET rate went from
+0% (Mar 24-Apr 5) to 95-100% (Apr 6 onward). Rate stdev 41.2pp across
+days, range 0-100%. This is not a filter firing on marginal signals —
+it's a regime switch triggered by something (likely wiring activation of
+check_market_relative) around Apr 6.
+
+---
+
+### Pattern: cascading defensive failures
+
+Three independent safety mechanisms, each individually reasonable, each
+assuming the others worked. The bug emerged from their interaction.
+Nobody had traced the full chain end-to-end before today.
+
+**CopyBot sizing ceiling, root-cause stack (Apr 22):**
+
+| # | Mechanism | Intent | Actual behavior |
+|---|-----------|--------|-----------------|
+| 1 | NOISE_BET_RATIO = 0.001 threshold | Fire only on thin markets | Fires on ~100% of signals at $1 bet size |
+| 2 | 0.5× multiplier on NOISE_BET | Downsize thin-market positions | Downscales ALL signals to half watchlist config |
+| 3 | MIN_LIVE_BET_USD = 1.00 floor | Enforce minimum bet size | Declared but never re-applied after multipliers |
+
+Each mechanism individually would have caught the bug if the others
+failed:
+- If threshold was right, multiplier wouldn't fire on 100% of signals
+- If multiplier was skip-not-scale, floor would be moot
+- If floor was re-applied post-multiplier, sub-floor bets wouldn't land
+
+All three had gaps, and the gaps compounded. Median live bet size $0.38
+despite $1 floor and $1 watchlist config.
+
+**Pattern lesson (reusable):**
+> When a system has multiple defensive mechanisms at different layers
+> (threshold gates, scaling adjustments, minimum floors), a single read-
+> only end-to-end trace of actual values through all layers is worth more
+> than N layers of code review. Each layer's author assumes the others
+> are doing their job correctly. Trace the numbers, not the intent.
+
+**Forward rule:**
+For any CopyBot sizing or filter change: pull the last 100 SIGNAL records,
+show the intermediate values at each decision point, verify the observed
+final value matches the intended formula. "CB-SIZING-FIX landed" and
+"median bet size is $1+" are not the same claim.
+
