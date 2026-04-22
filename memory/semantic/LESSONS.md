@@ -102,3 +102,64 @@ tagged with date.
   building the next layer. Resist the holy-grail "one prompt does
   everything" temptation — pipelines that promise to find/test/decide
   autonomously produce confident-sounding outputs that are wrong.
+
+---
+
+## 2026-04-22 — CopyBot execution audit: sizing ceiling finding
+
+**What we discovered:**
+Execution audit on 13,351 signals (paper + live combined) revealed CopyBot
+sizes at median 1.29% of source wallet bet size. Our median bet: $0.31.
+Their median bet: $28.80. Outcome correlation with source = 100% (same market,
+same direction), but P&L correlation = 0% because sizing magnitude makes
+our P&L mathematically capped at 1.3% of source P&L.
+
+17 days of live trading, 4 weeks of paper gate work, all operating under this
+ceiling. Gate quality, slippage, latency, selection tuning — all bounded by
+the sizing architecture regardless of correctness.
+
+**Load-bearing numbers:**
+- Median size ratio our/their (paper+live, n=13,351): 1.29%
+- Live-only sub-sample ratio: 1.25% (paper and live use same code path)
+- Median our_size_usd: $0.31
+- Median their_size_usd: $28.80
+- NOISE_BET skips: 13,178 (63.7% of all rejections)
+- CROWDED_SKIP: 7,508 (36.3%)
+- Slippage cost total across 161 live settled trades: $15.29 (trivial)
+
+**Process lessons (reusable for any copy/signal bot):**
+
+1. **Measure source-comparative performance, not absolute performance.** For
+   any copy-based strategy, the primary metric is "what % of source edge did
+   we capture," NOT "are we positive." 51.9% WR looked acceptable; 0% P&L
+   correlation on 100% outcome correlation was the real story.
+
+2. **Verify code changes against live effects, not commits.** CB-SIZING-FIX on
+   Apr 15 raised MIN_LIVE_BET_USD=1, commit landed, compile OK. Median live
+   bet size on subsequent fills remained $0.31. Code change ≠ observed effect.
+   Always pull post-deploy distribution to confirm the intended behavior.
+
+3. **When paper exactly matches live, one of them is lying.** Paper and live
+   had identical sizing ratios (1.25% vs 1.29%). Either paper over-simulates
+   realism (unlikely) or live execution bypasses something paper should have
+   (the case here). Divergence is a signal; exact match is too.
+
+4. **Ceiling analysis before tuning.** Before tuning filters / thresholds /
+   models, compute the theoretical maximum output of the system given current
+   architecture. 2.8 signals/day × $3 bet = $16/month WeatherBot ceiling —
+   same class of finding. Ceiling = architecture; tuning only gets you
+   closer to it.
+
+5. **Decomposed audits beat single headline numbers.** Splitting "capture %"
+   into three audits (execution leak, sizing gap, selection leak) revealed
+   sizing was the dominant lever. A single "edge capture %" number would
+   have masked which dimension to fix.
+
+**Forward implications:**
+- CB-FLIP-GATE shadow timer: continue observing, but do not expect outcome
+  impact at current sizing. Gate quality is bounded by sizing architecture.
+- CB-BACKTEST-TIER3: DEFER. Backtesting gate quality on a system clipped to
+  1% size won't reveal what gate quality is worth at full size.
+- CB-BACKTEST-RES-TS: demote HIGH → MED. Not urgent until sizing fix.
+- CB-SIZING-OVERHAUL: TOP PRIORITY. Investigation before any code change.
+
