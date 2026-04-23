@@ -1,7 +1,8 @@
 # Workspace — Live Task State
 
 Last updated: 2026-04-23 (Thursday, late PM)
-Updated by: Claude Code (BATCH3A-DEFER-REVIEW close)
+Updated by: Claude Code (BATCH3B-SKILL-LAND close)
+Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
 
