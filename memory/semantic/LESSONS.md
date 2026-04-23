@@ -243,3 +243,13 @@ show the intermediate values at each decision point, verify the observed
 final value matches the intended formula. "CB-SIZING-FIX landed" and
 "median bet size is $1+" are not the same claim.
 
+---
+
+## Record-integrity patterns
+
+* **Schema-lifecycle mismatch.** When a record contains fields written at different times by different code paths, those fields can describe different temporal states of the same entity — and consumers of the record may silently mix them. Surfaced 2026-04-23: CopyBot watchlist records hold `profiler_net_pnl` (write-once at harvester.py add-time) adjacent to `win_rate` (refreshed on every rescore_watchlist.py pass). APR14-AUDIT-140's static scan used both fields as if they described the same Apr 14 state; they didn't. Fix-class: either refresh all fields on every write pass, or name fields to signal their freshness contract (e.g. `profiler_net_pnl_at_add` vs `win_rate_rolling`). Prompt-side mitigation: when reading a record with multi-source fields, verify write contracts before treating fields as a coherent snapshot.
+
+* **File state vs content assertion.** A file's self-reported metadata (header dates, "Last updated" lines, version strings, README dates) is not the same as its filesystem state (mtime, git log). They can disagree, and when they disagree, that disagreement is itself a signal worth reporting explicitly. Surfaced 2026-04-23: Claude Chat read WORKSPACE.md's `Last updated: 2026-04-18` header line and reported "mirror serving 5-day-old content," when the file was actually Apr 21 on both disk and mirror — only the header had drifted from file state. Session writers had been appending bullets without refreshing the header. Two rules: (1) when evaluating staleness, check both file state and content assertions, and note disagreement; (2) when writing to a file with a "Last updated" header, refresh the header as part of the write — otherwise the header becomes a misleading artifact that future sessions will misread.
+
+* **LLM-emitted commands need syntactic validation before they land.** When an LLM produces machine-executable output (shell commands, API calls, SQL), prose hedges in the output text are not a substitute for a post-generation gate. Surfaced 2026-04-23: ScoutBot's auto_ingestor.py emitted `harvester.py --add 0x594edb91` (10 chars, invalid) alongside the hedge "(full address required)" — the LLM caught the problem, then wrote the row anyway. A 42-char hex regex between generation and persistence would have blocked it. Prompt engineering compounds unreliability; syntactic gates don't.
+
