@@ -1,11 +1,11 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-21 (Tuesday)
-Updated by: Claude Chat (evening close, 7-session CB-FLIP-GATE arc)
+Last updated: 2026-04-23 (Thursday)
+Updated by: Claude Chat (brain-sync recovery)
 
 ## Current focus
 
-**CB-FLIP-GATE is the new CopyBot dev track.** Spec (commit 2308c37) + observe-only shadow code (commit c1b6a36) + staged-but-not-enabled systemd units (/tmp/copybot-flip-gate-shadow.{service,timer}) + one-time backfill on all 129 T2 wallets (/opt/copybot/data/flip_gate_backfill_20260421.jsonl) landed today. Tomorrow's CopyBot work is **Path B data-source repair** — Gamma /markets returns empty outcomePrices on 89.1% of historical closed markets, which is what prevents Path B from admitting the textbook hold-to-resolution wallets the current gate mechanically rejects. Do NOT enable the staged timer until repair lands (shadow would collect misleading data). CB-EXIT-MIRROR and CB-SCORE-RESOLVED-ONLY are both now shelved by today's audit findings.
+**Brain-sync recovery + strategic findings.** 2026-04-23 session surfaced major process gap: Claude Chat had been updating /root/docs/AllBots_TODO_CURRENT.md (deprecated handover layer) instead of WORKSPACE.md (authoritative brain) for an unknown duration. All sessions this week operated on week-old /mnt/project/ snapshots. Architecture diagram + brain-mirror verification (brain commit d5d3257) confirmed the correct flow. This session mirrors today's 6 findings into the brain and fixes the onboarding doc. Next session: evaluate whether to formally retire AllBots_TODO_CURRENT.md and /mnt/project/ as data sources, or keep parallel-update as a safety net. Also pending: CB-FLIP-GATE-TIMEOUT validates at Fri 2026-04-24 02:30 UTC.
 
 ## Open tasks by bot
 
@@ -19,6 +19,14 @@ Updated by: Claude Chat (evening close, 7-session CB-FLIP-GATE arc)
 - [ ] CB-DECAY-MONITOR re-eval — ~Apr 25 with fresh post-demote cohort.
 - [ ] Sunday 06:00 UTC auto-rescore (SCAN-7) — Apr 26 is the next fire.
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats.
+
+**Added 2026-04-23:**
+- [ ] CB-FLIP-GATE-TIMEOUT (ACTIVE) — shadow-timer TimeoutStartSec raised 3600→21600. Gate: Fri 2026-04-24 02:30 UTC complete run.
+- [ ] CB-FLIP-GATE-TIER3 (GATED on CB-FLIP-GATE-TIMEOUT) — Tier-1 walk-forward null (0/960). Tier-3 is the real test. If Tier-3 also nulls: retire CB-FLIP-GATE apparatus.
+- [ ] CB-APR14-AUDIT140-FINDING (GATED on CB-WATCHLIST-DRIFT-AUDIT + CB-WR-ZERO-ANOMALY) — 140/140 of Apr 14 cull Task 3 audit-driven demotes are CULL_FALSE_POSITIVE. Aggregate $7.34M profiler_net_pnl falsely demoted. Report at /opt/copybot/logs/cb_apr14_audit140_report_20260423.md.
+- [ ] CB-WR-ZERO-ANOMALY (ACTIVE, MED) — 0x32ccd901 + 0x230287e2 show WR=0.000 with positive profiler_pnl over 100+ trades. Compute_profile edge case vs market-maker pattern vs data corruption.
+- [ ] CB-BUYHOLD-MONITOR (MONITORING, LOW) — Residual 0xdbdd45 + 0xeca1e9 from Apr 8 postmortem. Gated on CB-HARVESTER-BUYHOLD.
+- [ ] CB-HARVESTER-BUYHOLD (ACTIVE, MED) — Extend harvester to attribute P&L / band-rate to buy-only (BUY_HOLD) wallets. Unblocks CB-BUYHOLD-MONITOR and protects future culls from the blind spot.
 
 ### Shelved CopyBot tracks (closed this session)
 - CB-EXIT-MIRROR — SHELVED by LATENCY audit: architecture permits (83.8% reachable) but design is deliberate BUY-only; the $61 gain came mostly from thesis-violator wallets that should be pruned at source, not mirrored downstream. Any revive requires lifting activity_monitor.py:1012 side!=BUY skip + adding SELL path to clob_executor.py (additive, not rewrite).
@@ -49,8 +57,14 @@ Updated by: Claude Chat (evening close, 7-session CB-FLIP-GATE arc)
 - [ ] Polymarket exchange migration monitoring (@PolymarketDevs) — CTF allowance re-approval needed post-migration on all bot wallets.
 - [ ] Cost watch — 5 CC sessions on CopyBot today contributed to MTD $79.19 (528% over target). Tomorrow: single well-scoped CC session per bot, not sequential loops.
 
+**Added 2026-04-23:**
+- [x] INFRA-CHAT-ONBOARDING (DONE) — orientation doc at /root/.agent/CLAUDE_CHAT_ONBOARDING.md. Brain mirror base URL: https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/
+
 ## Recent decisions (last 7 days)
 
+- 2026-04-23: Onboarding doc URL corrections — earlier Phase 2 report (brain commit d5d3257) added obfuscation suffix to repo URL based on a claude.ai project-share URL misread as the canonical GitHub path. Corrected to plain `molensloot77-collab/bot-brain` (public, unauthenticated, matches git remote). Separately: mirror fetch via web_fetch showed stale Apr 18 WORKSPACE content despite Apr 21 on-disk version and Apr 22 push — GitHub caching or push-reliability gap. Filed for follow-up investigation.
+- 2026-04-23: Brain-rot diagnosed. Claude Chat had been updating AllBots_TODO_CURRENT.md (deprecated) instead of WORKSPACE.md (authoritative) for weeks. Brain-mirror read path verified via web_fetch — correct URL pattern documented in CLAUDE_CHAT_ONBOARDING.md.
+- 2026-04-23: APR14-AUDIT-140 static scan found 140/140 CULL_FALSE_POSITIVE on Apr 14 cull Task 3 audit slice. $7.34M falsely demoted. Same BUY_HOLD bug-class as Apr 8, 7× the scope. Restore gated on CB-WATCHLIST-DRIFT-AUDIT re-vet path.
 - 2026-04-21: CB-FLIP-GATE spec + observe-only shadow deployed (commits 2308c37, c1b6a36). Systemd timer staged at /tmp/ NOT enabled pending Path B data-source repair. Backfill on 129 T2 wallets complete. CB-EXIT-MIRROR and CB-SCORE-RESOLVED-ONLY shelved by audit findings.
 - 2026-04-21: Hold-to-resolution thesis vs admission gate contradiction documented — `activity_monitor.py:6` docstring targets hold-to-resolution traders; `wallet_profiler_full.py:374-379` gate requires closed_trades≥30 (mechanically excludes them). 75.8% of T2 violates 20% tight-hold threshold.
 - 2026-04-20: polybot.service killed (unauthorized 9-day paper-mode shadow); PolyArb dead-refs cleaned from 3 scripts (commit 654711c).

@@ -73,7 +73,39 @@ screen if nothing looks new-to-you:
 If a file at the URL returns 404, the nightly push failed or the file was
 renamed — fall back to asking BigW to run `cat /root/.agent/<path>` in chat.
 
-## 3. Cadence — how fresh is the mirror?
+## 3. Session-start workflow
+
+claude.ai's `web_fetch` tool only accepts URLs that BigW has explicitly
+included in the conversation. To give Claude Chat current brain state at
+session start, BigW should paste the following URLs at the start of every
+session (or reference this section):
+
+- WORKSPACE: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/working/WORKSPACE.md`
+- LESSONS: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/semantic/LESSONS.md`
+- SESSION_LOG: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/episodic/session_log.jsonl`
+
+Claude Chat's first action each session: fetch WORKSPACE.md and LESSONS.md
+to orient on current state. **Do not trust the MORNING_BRIEF.md
+system-prompt snapshot or `/mnt/project/` files as current — they are
+week+ stale.**
+
+## 4. Writing to the brain during a session
+
+Claude Chat MUST update `/root/.agent/memory/working/WORKSPACE.md` during
+every session that creates new TODOs, resolves existing ones, or records
+strategic decisions. The brain is primary; the handover docs in
+`/root/docs/` are deprecated (retirement deferred).
+
+If you find yourself writing to `/root/docs/AllBots_TODO_CURRENT.md`
+without also updating WORKSPACE.md, you are corrupting the
+source-of-truth. During the retirement period, parallel-write both —
+**brain first, handover mirror second.**
+
+New lessons worth preserving go into
+`/root/.agent/memory/semantic/LESSONS.md` (append-only, read before
+non-trivial decisions).
+
+## 5. Cadence — how fresh is the mirror?
 
 - The brain is pushed **only when BigW manually runs `/root/docs/evening.sh`**
   at session close. There is no automated schedule.
@@ -87,7 +119,7 @@ renamed — fall back to asking BigW to run `cat /root/.agent/<path>` in chat.
   the mirror is right — today's work hasn't been pushed yet. Don't assume
   the action was skipped; ask BigW to confirm or paste the relevant state.
 
-## 4. The deprecated trap — `/mnt/project/`
+## 6. The deprecated trap — `/mnt/project/`
 
 The `/mnt/project/*_CURRENT.md` tree that your UI may surface (e.g.
 `CopyBot_Handover_CURRENT.md`, `WeatherBot_Handover_CURRENT.md`) is
@@ -106,7 +138,7 @@ incidents (2026-04-23):
 No exceptions. If you only have `/mnt/project/`, flag it to BigW and ask
 for the brain read, rather than guessing.
 
-## 5. `WORKSPACE.md` vs `AllBots_TODO_CURRENT.md`
+## 7. `WORKSPACE.md` vs `AllBots_TODO_CURRENT.md`
 
 Two files track work-in-progress. They look similar and occasionally drift.
 
@@ -127,7 +159,7 @@ Two files track work-in-progress. They look similar and occasionally drift.
   to the server: `systemctl status`, the bot's own log files, signals
   JSONL, etc.
 
-## 6. `MORNING_BRIEF.md` — where it fits
+## 8. `MORNING_BRIEF.md` — where it fits
 
 Auto-generated at 03:10 UTC each day by `/root/docs/morning_cron` (reads
 live server state — systemctl, signals log, API cost ledger, git log —
@@ -140,7 +172,7 @@ generated fresh from live state. If it disagrees with WORKSPACE.md on
 anything overnight-related, MORNING_BRIEF wins — WORKSPACE hasn't been
 updated with overnight activity yet.
 
-## 7. Standing rules of the road
+## 9. Standing rules of the road
 
 These come from `PREFERENCES.md`; duplicating the session-critical ones here.
 
@@ -161,7 +193,7 @@ These come from `PREFERENCES.md`; duplicating the session-critical ones here.
 - **Don't reopen settled questions listed in `FALSIFIED.md`** without new
   evidence.
 
-## 8. What to do if this doc is wrong
+## 10. What to do if this doc is wrong
 
 The brain is versioned. If something in here doesn't match server reality
 (e.g. repo has gone private, a file path has moved, a skill has been

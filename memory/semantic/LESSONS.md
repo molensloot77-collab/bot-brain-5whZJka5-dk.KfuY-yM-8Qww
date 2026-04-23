@@ -40,6 +40,7 @@ tagged with date.
 - "Hold the target, diagnose first." If a strategy underperforms, figure out why before changing parameters.
 - CopyBot cull post-mortem (Apr 16): 95.7% of pre-cull edge was in wallets the cull removed. The answer "wallet selection is broken" took ~5 sessions to surface because we kept tweaking the strategy instead of auditing the selection filter.
 - Corollary: when a filter rejects ≥90% of signals, the filter is the hypothesis under test, not the strategy.
+- **Bug-class scope expansion.** When a bug is identified, postmortem the bug class, not the incident. Enumerate every code path, scheduled job, or downstream artifact that consumed the bug-class's output during its active window. Treat unknown-status surfaces as suspected-affected until proven safe — silence is not evidence of safety. Surfaced 2026-04-23: Apr 8 cull postmortem caught BUY_HOLD-blind `reconstruct_pnl()` at top-20 scope (10 restores landed Apr 17). Same bug ran on Apr 14 at 140-wallet scope and was missed for 9 days because the kill-switch alert fired on aggregate WR, not on the specific cohort. $7.34M of falsely-demoted edge sat untouched. The loudest failure is rarely the only failure.
 
 ## Architecture rules
 
