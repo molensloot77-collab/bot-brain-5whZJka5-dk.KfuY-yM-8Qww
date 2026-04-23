@@ -59,6 +59,7 @@ Updated by: Claude Chat (brain-sync recovery)
 
 **Added 2026-04-23:**
 - [x] INFRA-CHAT-ONBOARDING (DONE) — orientation doc at /root/.agent/CLAUDE_CHAT_ONBOARDING.md. Brain mirror base URL: https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/
+- [ ] INFRA-PUSH-RELIABILITY (ACTIVE, MED) — Apr 23 session found mirror-fetch showed Apr 18 WORKSPACE content despite Apr 21 on-disk version and Apr 22 push commit ea06965. Either GitHub caching (usually 5min TTL, shouldn't show day-old content) or evening.sh push missed specific files. Diagnostic: verify recent evening.sh runs actually committed + pushed every changed brain file; compare push manifest to git log; test GitHub raw URL cache behavior on a fresh commit.
 
 ## Recent decisions (last 7 days)
 
