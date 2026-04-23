@@ -69,6 +69,7 @@ Updated by: Claude Chat (brain-sync recovery)
 - [ ] SCT-AUTO-903/904 (DEFER, 5.5) — lead-lag methodology (903) and Granger causality (904) as MON-30 flow-spike pre-filters / wallet activity prioritization.
 - [ ] SCT-AUTO-906 (DEFER, 5.0) — gensyn-delphi-skills REST API compatibility audit vs py_clob_client patterns used across the suite.
 - [x] SCT-AUTO-REJECTS-APR23 (8 items REJECT-FALSIFIED) — 882 (WB-compare), 883/884/885 (Pangu-Weather upgrades for retired WB), 892/893/894 (PolyArb hack-market), 905 (Delphi-for-PolyArb). Matches LESSONS.md pipeline observation: ScoutBot recycles falsified categories at ~27% rate (8/30 this batch). Reinforces the weekly scout-quality-audit skill candidate — threshold already hit.
+- [ ] INFRA-SCOUT-TRUNCATION (ACTIVE, MED) — SCT-AUTO-881 blocked during Apr 23 triage: wallet address arrived truncated as 0x594edb91 (10 hex chars, should be 40). Root cause unknown — either ScoutBot output format issue or ingest-into-AllBots_TODO_CURRENT.md handling dropped chars. Diagnostic: compare ScoutBot's raw output for SCT-AUTO-881 against the row that landed in the TODO file, identify the truncation point. Single-probe task.
 
 ## Recent decisions (last 7 days)
 
