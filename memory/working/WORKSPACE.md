@@ -27,6 +27,11 @@ Updated by: Claude Chat (brain-sync recovery)
 - [ ] CB-WR-ZERO-ANOMALY (ACTIVE, MED) — 0x32ccd901 + 0x230287e2 show WR=0.000 with positive profiler_pnl over 100+ trades. Compute_profile edge case vs market-maker pattern vs data corruption.
 - [ ] CB-BUYHOLD-MONITOR (MONITORING, LOW) — Residual 0xdbdd45 + 0xeca1e9 from Apr 8 postmortem. Gated on CB-HARVESTER-BUYHOLD.
 - [ ] CB-HARVESTER-BUYHOLD (ACTIVE, MED) — Extend harvester to attribute P&L / band-rate to buy-only (BUY_HOLD) wallets. Unblocks CB-BUYHOLD-MONITOR and protects future culls from the blind spot.
+- [ ] SCT-AUTO-881 (BLOCKED, 7.4) — harvester --add requested but source address truncated to `0x594edb91` (10/42 chars). Full address needed from BigW before profiling/gating.
+- [ ] SCT-AUTO-886/887/888 (DEFER, 7.1) — runesleo/polymarket-toolkit integration eval: codebase audit (886), address profiler as harvester pre-filter on SCT-AUTO-865..877 backlog (887), strategy-classification output mapped to MON-26c category WR scaling (888).
+- [ ] SCT-AUTO-889/890/891 (DEFER, 6.9) — Forecaster Arena LLM wallet hunt (github.com/setrf/forecasterarena, 7 frontier LLMs competing on Polymarket). 889: identify addresses from leaderboard. 890: --add top 3 performers after 889 completes. 891: monitoring-feed gate at ROI>15%.
+- [ ] SCT-AUTO-895/898/899/900/901/902/907 (DEFER, 7 wallet-adds scores 5.0-6.4) — all below 7.0 auto-exec floor. Full addresses captured in /tmp/scout_apr23_triaged.json for future batch re-vet.
+- [ ] SCT-AUTO-896/897 (DEFER, 6.3) — humanplane/terminal eval: leaderboard drill-down API audit (896), SSE order book feed as MON-30 price-drift detection input (897).
 
 ### Shelved CopyBot tracks (closed this session)
 - CB-EXIT-MIRROR — SHELVED by LATENCY audit: architecture permits (83.8% reachable) but design is deliberate BUY-only; the $61 gain came mostly from thesis-violator wallets that should be pruned at source, not mirrored downstream. Any revive requires lifting activity_monitor.py:1012 side!=BUY skip + adding SELL path to clob_executor.py (additive, not rewrite).
@@ -60,6 +65,10 @@ Updated by: Claude Chat (brain-sync recovery)
 **Added 2026-04-23:**
 - [x] INFRA-CHAT-ONBOARDING (DONE) — orientation doc at /root/.agent/CLAUDE_CHAT_ONBOARDING.md. Brain mirror base URL: https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/
 - [ ] INFRA-PUSH-RELIABILITY (ACTIVE, MED) — Apr 23 session found mirror-fetch showed Apr 18 WORKSPACE content despite Apr 21 on-disk version and Apr 22 push commit ea06965. Either GitHub caching (usually 5min TTL, shouldn't show day-old content) or evening.sh push missed specific files. Diagnostic: verify recent evening.sh runs actually committed + pushed every changed brain file; compare push manifest to git log; test GitHub raw URL cache behavior on a fresh commit.
+- [ ] SCT-AUTO-878/879/880 (DEFER, 8.1) — playbook audit trio: edges section review across CopyBot/KrajekBot/WeatherBot (878), anti-patterns audit against current bot behavior (879), API robustness/resilience patterns extraction applicable to server at 204.168.154.197 (880).
+- [ ] SCT-AUTO-903/904 (DEFER, 5.5) — lead-lag methodology (903) and Granger causality (904) as MON-30 flow-spike pre-filters / wallet activity prioritization.
+- [ ] SCT-AUTO-906 (DEFER, 5.0) — gensyn-delphi-skills REST API compatibility audit vs py_clob_client patterns used across the suite.
+- [x] SCT-AUTO-REJECTS-APR23 (8 items REJECT-FALSIFIED) — 882 (WB-compare), 883/884/885 (Pangu-Weather upgrades for retired WB), 892/893/894 (PolyArb hack-market), 905 (Delphi-for-PolyArb). Matches LESSONS.md pipeline observation: ScoutBot recycles falsified categories at ~27% rate (8/30 this batch). Reinforces the weekly scout-quality-audit skill candidate — threshold already hit.
 
 ## Recent decisions (last 7 days)
 
