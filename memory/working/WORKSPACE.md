@@ -1,7 +1,7 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-24 (Friday, mid-UTC, MIRROR-FRESHNESS fix)
-Updated by: Claude Code (INFRA-BRAIN-MIRROR-FRESHNESS close)
+Last updated: 2026-04-24 (Friday, late PM, CB-FLIP-GATE-TIMEOUT-V2 + corrections)
+Updated by: Claude Code (CB-FLIP-GATE-TIMEOUT-V2 session)
 Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
@@ -11,10 +11,10 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 ## Open tasks by bot
 
 ### CopyBot
-- [ ] CB-FLIP-GATE Path B data-source repair — Gamma unusable for 89.1% of historical cids. Candidates: CLOB resolution endpoint, bulk check_pm_settlement (activity_monitor.py:1354), paginated Gamma ?closed=true index build. Blocks timer enable.
+- [ ] CB-FLIP-GATE Path B data-source repair — Gamma 89.1% unusable figure measured against backfill-universe (T2 watchlist, high-n_held wallets). Nightly universe (candidates_pending_review.json, n~3906) shows PATH_B_DATA_UNAVAILABLE at 1.0% on Apr 24 run. The 'repair needed' framing applies only to backfill mode; nightly Path B is functional. Blocks backfill-mode timer enable; does NOT block nightly (which is already firing).
 - [ ] CB-FLIP-GATE backfill review — survival 0.20→25 / 0.25→29 / 0.30→33 / 0.35→39 / 0.40→45 of 129. Scale question: is a 33-45 wallet watchlist enough signal volume for the paper track?
 - [ ] 0x2c1bf2a1 demote revisit — 21.1% flip, passes Path A and flip filter at ≥0.25. Yesterday's WR-based demote may have been collateral damage to a thesis-compliant wallet.
-- [ ] Enable /tmp/copybot-flip-gate-shadow.timer — ONLY after Path B repair. Needs `systemctl daemon-reload` + `enable --now`.
+- [x] Enable copybot-flip-gate-shadow.timer (DONE retroactively) — timer has been at /etc/systemd/system/ and enabled since 2026-04-22, firing nightly at 02:30 UTC against candidates_pending_review.json (nightly mode). Path B repair concern was scoped to backfill mode, not nightly. WORKSPACE line predates the timer move and was never updated.
 - [x] CB-WATCHLIST-DRIFT-AUDIT (DONE 2026-04-23) — Investigated. Prune was 2026-04-18 (not Apr 15-17; date anchored on backup filename, not event log). Mechanism: rescore_watchlist.py SCAN-7 INACTIVE filter ('0 trades in 30 days'). 2,100 wallets removed; ~1,570 structurally correct. Only ~144 are Mode B re-vet candidates (139 APR14-AUDIT-140 + 5 T2). Not the same bug class as Apr 8 / Apr 14 Task 3 (reconstruct_pnl). Spawned CB-MONTHLY-REVIEW-BUYHOLD. Full report: /opt/copybot/logs/cb_watchlist_drift_diag_20260423.md.
 - [x] CB-MONTHLY-REVIEW-BUYHOLD (DONE 2026-04-23) — Resolved via BATCH2B-MODE-B Phase 1. Patched monthly_watchlist_review.py classify() with BUY_HOLD exemption: wallets where sell_count==0 AND buy_count_30d>10 now return KEEP_BUYHOLD_EXEMPT instead of INACTIVE_CULL'ing on the closed<30 AND days_active>60 branch. Uses all-time sell_count as conservative proxy (profiler doesn't expose sell_count_30d). Telemetry tag "buyhold_exempt" distinguishes from generic "thin_sample" keeps. Provisional bridge until CB-HARVESTER-BUYHOLD delivers structural pair-independent edge measurement. py_compile PASS; 11/11 unit tests PASS; dry-run on 33 WATCHLIST_ONLY entries clean (0 accidental flips). Report: /opt/copybot/logs/cb_mode_b_restore_execution_20260423.md §1.
 - [ ] CB-MARTINGALE-WATCH-0x8a81855d — monitor for n≥50 or single-loss >$5. Current: 77.3% WR n=22 +$1.80 paper, on-chain flag -$32K Martingale.
@@ -23,7 +23,7 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats.
 
 **Added 2026-04-23:**
-- [ ] CB-FLIP-GATE-TIMEOUT (ACTIVE) — shadow-timer TimeoutStartSec raised 3600→21600. Gate: Fri 2026-04-24 02:30 UTC complete run.
+- [x] CB-FLIP-GATE-TIMEOUT (SUPERSEDED 2026-04-24 by CB-FLIP-GATE-TIMEOUT-V2) — 6h budget insufficient. Apr 24 run completed 1340/3906 wallets (34.7%) before SIGTERM at the 6h boundary. Throughput is n_held-driven Gamma-query cost, not a bug — mean 15.9s/wallet but right-tailed (p99=209s, max=577s) on high-n_held signal-rich wallets. Full cohort ~17h at observed rate.
 - [ ] CB-FLIP-GATE-TIER3 (GATED on CB-FLIP-GATE-TIMEOUT) — Tier-1 walk-forward null (0/960). Tier-3 is the real test. If Tier-3 also nulls: retire CB-FLIP-GATE apparatus.
 - [x] CB-APR14-AUDIT140-FINDING (DONE 2026-04-23) — Resolved via BATCH2B-MODE-B. Fresh compute_profile applied to 139 swept APR14 cohort + 5 T2-INACTIVE-swept = 144 candidates. Buckets: RESTORE-T2 112, RESTORE-WATCHLIST-AMBIGUOUS 7, HAND-REVIEW 5 (all Path A-promoted to T2), NO-RESTORE-FAILED-GATES 20. Phase 5 executed 124/124 adds successfully after moving 129 stale BUY_HOLD-blind entries from rejected_wallets.jsonl to rejected_wallets_superseded_20260423.jsonl (fourth surface of BUY_HOLD-blind bug-class). Freshness caveat INVERTED: fresh net_pnl_pm sum for 139 = $8.07M vs Apr 14 snapshot $7.34M (ratio 1.10x); historical edge grew rather than decayed, contra CB-WR-ZERO-ANOMALY concern. Watchlist 162→286. Report: /opt/copybot/logs/cb_mode_b_restore_execution_20260423.md.
 - [x] CB-WR-ZERO-ANOMALY (DONE 2026-04-23) — Hypothesis A confirmed with specific mechanism. 0x32ccd901 and 0x230287e2 are both currently pure BUY_HOLD wallets (6,000/5,996 BUYs, ~0 SELLs, 5-6 day visible history). compute_profile correctly returns WR=0.000 when closed_trades=0 (wallet_profiler_full.py:297). The apparent WR-vs-PnL contradiction in the Apr 14 snapshot comes from schema-lifecycle drift: profiler_net_pnl/profiler_closed_trades/profiler_top_category are WRITE-ONCE at harvester add-time (harvester.py:517-519, 561-563), while win_rate and net_pnl_pm are refreshed on every rescore pass (rescore_watchlist.py:289, 296). A record can contain profiler_net_pnl from weeks ago alongside win_rate from today. See INFRA-PROFILER-FIELD-FRESHNESS.
@@ -38,6 +38,11 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] SCT-AUTO-889 (INVESTIGATE, MED) — Forecaster Arena wallet-address discovery (github.com/setrf/forecasterarena, 7 frontier LLMs competing on Polymarket). HTTP-fetch their leaderboard/public data, extract Polymarket wallet addresses, profile candidates against standing LESSONS.md gates. If candidates surface, SCT-AUTO-890 activates; otherwise both close.
 - [ ] SCT-AUTO-890 (MONITOR, gated on SCT-AUTO-889) — Forecaster Arena top-3 wallet-add. Activates if SCT-AUTO-889 surfaces qualifying candidates (add top-3 passing gates). SCT-AUTO-891 ROI>15% gate dropped as premature.
 - [ ] SCT-AUTO-896 (INVESTIGATE, LOW) — Humanplane terminal leaderboard API audit. What's the API, is data quality sufficient, does it duplicate Polymarket activity API. Absorbs SCT-AUTO-897 (SSE order book feed for MON-30 price-drift detection) as a conditional follow-up.
+
+**Added 2026-04-24:**
+- [ ] CB-FLIP-GATE-TIMEOUT-V2 (ACTIVE) — TimeoutStartSec raised 21600→86400 (24h) on /etc/systemd/system/copybot-flip-gate-shadow.service, daemon-reload applied. Gate: Saturday 2026-04-25 02:30 UTC natural fire reaches EndOfRun before SIGTERM. If 24h budget also insufficient: engineering conversation on parallelism / per-cid Gamma caching / cohort reduction, not another timeout raise.
+- [ ] CB-FLIP-GATE-TIER3-CRITERIA (ACTIVE, MED, gates Tier-3 decision) — WORKSPACE framing 'if Tier-3 also nulls: retire CB-FLIP-GATE apparatus' was written assuming Tier-1's retention test. Nightly is admission-filter, not retention. Need to sharpen pass/fail criterion before Saturday's full-cohort result lands: candidate frame 'of flip-filter-admitted candidates at threshold T, forward 30-day P&L exceeds flip-filter-rejected candidates by X% at n>=Y; else null'. Decide X, Y, T values before consuming Saturday's output. Do not reuse Tier-1 null logic.
+- [ ] CB-FLIP-GATE-TRACEABILITY (LOW, opportunistic) — flip_gate_shadow.jsonl records carry no run_ts or input-file hash. candidates_pending_review.json is rewritten nightly (~03:01 UTC, 31 min into the gate run) so sequential-night runs can score different universes with no cross-reference. Fix: emit one header-record per run with run_ts + sha256(input_file) + wallet_count at jsonl start. One-line addition. Grab on next flip_gate_shadow.py touch.
 
 ### Shelved CopyBot tracks (closed this session)
 - CB-EXIT-MIRROR — SHELVED by LATENCY audit: architecture permits (83.8% reachable) but design is deliberate BUY-only; the $61 gain came mostly from thesis-violator wallets that should be pruned at source, not mirrored downstream. Any revive requires lifting activity_monitor.py:1012 side!=BUY skip + adding SELL path to clob_executor.py (additive, not rewrite).
