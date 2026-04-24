@@ -284,3 +284,28 @@ When one of N bots eventually retires, any shared infrastructure named after tha
 Phase 0 audit of INFRA-RETIRE-CLEANUP greped for `weatherbot|krajek|polybot|polyarb` strings across active surfaces. It missed three runtime readers/writers of `AllBots_TODO_CURRENT.md` in `/opt/scoutbot/` because the audit looked for retired-bot *names*, not the file *name* about to be deleted. Caught at the pre-deletion grep gate (Task 1.5), required a mid-session insert (Tasks 1.4e–1.4i, ~30 min) to redirect ScoutBot to `SCOUTBOT_INBOX.md`. Without the gate, ScoutBot's nightly run at Sat 02:00 UTC would have crashed, generating phantom morning-brief alerts and potentially data loss in the SCT-AUTO promotion path.
 
 **Reusable rule:** When auditing for "what depends on X before deletion", grep for X's *file name* and *path*, not just for the *concept* X represents. The two greps surface different sets. Concept greps catch usage in code logic; path greps catch readers/writers.
+
+### 2026-04-24 — Feature-flag execution as a Phase 0 alternative
+
+When a structural fix has multiple surfaces of risk (e.g. CB-HARVESTER-BUYHOLD: 4 known BUY_HOLD-blind surfaces in 16 days), feature-flag execution offers a natural Phase-0 analog that doesn't require a separate investigation session:
+
+- Producer writes new data; no consumer changes
+- Natural observation window (next cron pass, batch cycle, etc.)
+- Diagnostic report compares old-vs-new in production
+- Consumer flip gated on review of that diagnostic
+
+The equivalence: Phase 0 audit = "what WILL the change affect?" Feature-flag observation = "what DID the change produce?" Both answer the same class of question (does the planned change do what we think?) but the flag gives ground truth against production data, where audit gives projection. Use audit when you can't test in production safely (destructive changes, irreversible moves, cost-committed operations). Use feature-flag when you can run producer + consumer in parallel.
+
+Caveat: feature-flag requires discipline. The flag must stay OFF by default; the diagnostic must actually run; BigW must actually review before the flip. Skipping any of these collapses back to a direct consumer change with extra steps.
+
+Also: the flag's existence must be discoverable (AGENT.md + rescore.log line), or future sessions forget the system has a flag and make direct changes underneath it.
+
+### 2026-04-24 — Acceptance-test sanity expectations need to match the bug being fixed
+
+Phase 1 design report Task 2.1.6 said: "pair-matched-rich wallet: resolved_pnl should roughly equal existing profiler_net_pnl (they measure similar things for this wallet type)." Phase 2 acceptance test on a real pair-matched-rich proxy wallet (8,647 closed pair trades) showed profiler_resolved_pnl=$2,158 vs profiler_net_pnl=$62,268 — a 30× gap. Initial reaction: "bug in implementation."
+
+Investigation showed it was correct behavior: the wallet has many unmatched-buy positions (held to resolution, lost; never recorded as SELL in /activity stream). Legacy pair-matched scoring is BLIND to those held-to-resolution losses. The new attribution catches them via the per-cid /markets fallback. The wallet's true edge IS $2k, not $62k.
+
+This is exactly the BUY_HOLD-blind bug class the fix addresses. The Phase 1 sanity-check intuition was wrong: pair-matched-rich wallets can have very different new vs legacy P&L if they hold-to-resolution at all. The correct sanity check: profiler_realized_ratio + open_positions count + proxy_fallback_hits together tell whether the wallet has structurally different P&L profile than the legacy scorer can see.
+
+**Reusable rule:** when writing acceptance tests for a fix, the sanity expectations must NOT assume the bug doesn't exist. Test outputs that "look like the legacy" prove the new implementation copies the bug. Test outputs that DIVERGE from legacy in the predicted direction prove the new implementation surfaces what was hidden. Build the divergence into the test: pick at least one wallet where you expect the new and old to disagree, and verify they do.
