@@ -4,7 +4,7 @@ version: 2026-04-19
 triggers: ["strategic review", "review threads", "what's worth doing", "weekly review"]
 tools: [bash, grep]
 preconditions:
-  - "/root/docs/AllBots_TODO_CURRENT.md exists"
+  - "/root/.agent/memory/working/SCOUTBOT_INBOX.md exists"
   - "/root/.agent/memory/semantic/FALSIFIED.md exists"
 constraints:
   - "Read-only inputs — no bot code or TODO file is modified"
@@ -32,18 +32,19 @@ read in 5 minutes on a Sunday and use to pick the next week's focus.
 
 ### 1. Pull candidate items
 
-From `/root/docs/AllBots_TODO_CURRENT.md`, extract all rows matching
-`SCT-AUTO-N` with composite_score ≥ 7.0 AND status == "ACTIVE" AND
-date ≥ (today − 14 days).
+From `/root/.agent/memory/working/SCOUTBOT_INBOX.md` "## Pending items"
+section, extract all rows matching `SCT-AUTO-N` with composite_score ≥ 7.0
+AND status == "ACTIVE" AND date ≥ (today − 14 days).
 
-Row format: `| SCT-AUTO-N | bot | description | prio | status | gate | score | date |`
+Row format (preserved from pre-2026-04-24 schema):
+`| SCT-AUTO-N | bot | description | prio | status | gate | score | date |`
 After awk split with `-F'|'`: $2=id, $3=bot, $4=description, $5=prio,
 $6=status, $7=gate, $8=score, $9=date, NF=10.
 
 ```bash
 TODAY=$(date -u +%Y-%m-%d)
 CUTOFF=$(date -u -d "14 days ago" +%Y-%m-%d)
-grep -E "^\| SCT-AUTO-[0-9]+" /root/docs/AllBots_TODO_CURRENT.md | \
+grep -E "^\| SCT-AUTO-[0-9]+" /root/.agent/memory/working/SCOUTBOT_INBOX.md | \
   awk -F'|' -v cutoff="$CUTOFF" '{
     if (NF != 10) {
       print "WARN: malformed row, skipping: " substr($0,1,80) > "/dev/stderr";
@@ -59,6 +60,11 @@ Column-count sanity check is mandatory: silent miscounts on malformed rows
 are worse than visible skips. Warnings go to stderr so the triage output
 stays clean but skipped rows remain auditable. RETIRED / DONE / DEFERRED /
 CLOSED items are excluded — they've already been adjudicated.
+
+(Pre-2026-04-24 source was `/root/docs/AllBots_TODO_CURRENT.md`; that file
+was retired and its 934 historical IDs are now baked into SCOUTBOT_INBOX.md
+header as a dedup roster — they should be skipped here too via the date
+cutoff.)
 
 ### 2. Group by type
 

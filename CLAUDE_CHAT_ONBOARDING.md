@@ -29,11 +29,12 @@ SERVER (root@204.168.154.197 Hetzner Helsinki HEL1)
 │   ├── skills/_index.md                    ← skill registry + trigger phrases
 │   └── .git                                ← mirrored to github.com/molensloot77-collab/bot-brain
 │
-├── /root/docs/                ← operational docs repo. Morning briefs, TODO mirror,
+├── /root/docs/                ← operational docs repo. Morning briefs,
 │                                 session logs, evening.sh. Also git-backed. SECONDARY.
 │
-├── /root/docs/AllBots_TODO_CURRENT.md      ← TODO mirror. Kept for safety but
-│                                              WORKSPACE.md is the live state.
+├── /root/.agent/memory/working/SCOUTBOT_INBOX.md  ← ScoutBot's nightly auto-promoted
+│                                                     items. Triage gate before items
+│                                                     enter WORKSPACE.md "Open tasks".
 ├── /root/docs/MORNING_BRIEF.md             ← auto-generated each morning at 03:10 UTC
 │                                              by morning_cron; reads current server
 │                                              state, not handover docs.
@@ -93,13 +94,14 @@ week+ stale.**
 
 Claude Chat MUST update `/root/.agent/memory/working/WORKSPACE.md` during
 every session that creates new TODOs, resolves existing ones, or records
-strategic decisions. The brain is primary; the handover docs in
-`/root/docs/` are deprecated (retirement deferred).
+strategic decisions. The brain is the **sole source of truth** as of
+2026-04-24 cutover.
 
-If you find yourself writing to `/root/docs/AllBots_TODO_CURRENT.md`
-without also updating WORKSPACE.md, you are corrupting the
-source-of-truth. During the retirement period, parallel-write both —
-**brain first, handover mirror second.**
+`/root/docs/AllBots_TODO_CURRENT.md` was retired 2026-04-24. Do not write
+to it; do not look for it. ScoutBot's nightly auto-promoted items now land
+in `/root/.agent/memory/working/SCOUTBOT_INBOX.md` under `## Pending items`
+for human triage. Accepted items get copied to WORKSPACE.md "Open tasks";
+rejected items go to `/root/.agent/memory/semantic/scout_quality_log.md`.
 
 New lessons worth preserving go into
 `/root/.agent/memory/semantic/LESSONS.md` (append-only, read before
@@ -138,26 +140,28 @@ incidents (2026-04-23):
 No exceptions. If you only have `/mnt/project/`, flag it to BigW and ask
 for the brain read, rather than guessing.
 
-## 7. `WORKSPACE.md` vs `AllBots_TODO_CURRENT.md`
+## 7. `WORKSPACE.md` vs `SCOUTBOT_INBOX.md` (post 2026-04-24 cutover)
 
-Two files track work-in-progress. They look similar and occasionally drift.
+Two files track work-in-progress under the brain. They serve different roles
+and should never disagree on the same item.
 
-- **`/root/.agent/memory/working/WORKSPACE.md` = LIVE STATE.** Authoritative.
-  Written by Claude Chat at evening close and by Claude Code during work.
-  Brain-mirrored. This is what you should read at session start.
-- **`/root/docs/AllBots_TODO_CURRENT.md` = LONG-FORM TODO MIRROR.** Bigger,
-  schema'd table. Written mostly by Claude Code sessions (per-task row
-  additions) and by the evening updater. Ships in the `/root/docs/` repo,
-  not the brain. Claude Code sessions often update this one directly
-  without touching WORKSPACE. **That's expected drift**, resolved at the
-  next evening close.
-- **If the two disagree on a task's status:** the more recently-touched one
-  is usually right. For FINISHED work, trust `AllBots_TODO_CURRENT.md`
-  (Claude Code rows it immediately). For NEXT-ACTION / current focus,
-  trust WORKSPACE.md.
-- **Neither of them is the bot's actual running state.** For that you go
-  to the server: `systemctl status`, the bot's own log files, signals
-  JSONL, etc.
+- **`/root/.agent/memory/working/WORKSPACE.md` = LIVE TASK STATE.**
+  Authoritative. Written by Claude Chat at evening close and by Claude Code
+  during work. Brain-mirrored. Read at session start.
+- **`/root/.agent/memory/working/SCOUTBOT_INBOX.md` = TRIAGE QUEUE.**
+  Auto-appended by ScoutBot's nightly run (`todo_extractor.py`) under
+  `## Pending items`. Items here are PROPOSED, not active. Claude Chat
+  triages each morning: accepted → copy to WORKSPACE "Open tasks" with
+  appropriate priority + delete from inbox. Rejected → log to
+  `scout_quality_log.md` + delete from inbox.
+- **`/root/docs/AllBots_TODO_CURRENT.md` no longer exists.** Retired
+  2026-04-24. The pre-cutover snapshot lives at
+  `/tmp/AllBots_TODO_CURRENT.md.pre_scoutbot_redirect_20260424` (md5
+  0e339b7181fb6749e031f776f950ac2e); the 934 historical SCT-AUTO IDs are
+  baked into SCOUTBOT_INBOX.md's header so the dedup-roster doesn't
+  re-promote them.
+- **Neither file is the bot's actual running state.** For that go to the
+  server: `systemctl status`, the bot's own log files, signals JSONL, etc.
 
 ## 8. `MORNING_BRIEF.md` — where it fits
 

@@ -103,8 +103,9 @@ wc -l /opt/copybot/data/sports_positions.json   # open-position map (by order_id
    - Gate is May 7 extended (not Apr 22) due to Polymarket resolution lag;
      win_rate will remain PEND until first settled trade window (Apr 30 earliest).
 
-7. **ScoutBot overnight priority items:**
-   - `grep "$(date -u +%F)" /root/docs/AllBots_TODO_CURRENT.md | grep SCT-AUTO | head -10`
+7. **ScoutBot overnight priority items (post 2026-04-24 cutover):**
+   - `grep "$(date -u +%F)" /root/.agent/memory/working/SCOUTBOT_INBOX.md | grep SCT-AUTO | head -10`
+   - Items live in SCOUTBOT_INBOX.md "## Pending items" section pending human triage. Triage promotes accepted items into WORKSPACE.md "Open tasks".
 
 8. **Cross-bot blockers due today:**
    - `grep "$(date -u +%F)" /root/.agent/memory/working/WORKSPACE.md`

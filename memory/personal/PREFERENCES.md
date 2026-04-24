@@ -16,7 +16,7 @@ don't re-derive from scratch each time.
 - **Result reporting format:**
   - Task results: `| HH:MM UTC | RESULT: TASK-N | STATUS: COMPLETE/FAILED | <one-line summary>`
   - Section timestamps: `| HH:MM:SS UTC | {description}`
-- **Every Claude Code prompt includes Task 0:** grep today's SCT-AUTO items from `/root/docs/AllBots_TODO_CURRENT.md` using `grep "$(date '+%Y-%m-%d')" | grep SCT-AUTO`.
+- **Every Claude Code prompt includes Task 0:** grep today's SCT-AUTO items from `/root/.agent/memory/working/SCOUTBOT_INBOX.md` using `grep "$(date '+%Y-%m-%d')" | grep SCT-AUTO`. (Pre-2026-04-24 the source was `/root/docs/AllBots_TODO_CURRENT.md`; that file was retired.)
 - **Handover docs are evening-only.** Never update them mid-session. The evening routine owns them.
 - **Don't close a session** until BigW explicitly asks for a close block.
 - **Session logs** produced by Claude Chat at close, saved to `/root/docs/session_logs/YYYYMMDD_CHAT_{BOT}_session.md`. Not deferred to `evening.sh`.
