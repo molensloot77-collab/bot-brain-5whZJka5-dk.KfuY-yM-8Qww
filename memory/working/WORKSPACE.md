@@ -1,7 +1,7 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-24 (Friday, end-of-day, systemd-activation-timing correction)
-Updated by: Claude Code (LESSONS append session)
+Last updated: 2026-04-24 (Friday, late, TIER3 criterion pre-committed)
+Updated by: Claude Code (TIER3-CRITERIA pre-commitment session)
 Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
@@ -41,7 +41,19 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 
 **Added 2026-04-24:**
 - [ ] CB-FLIP-GATE-TIMEOUT-V2 (ACTIVE) — TimeoutStartSec raised 21600→86400 (24h) on /etc/systemd/system/copybot-flip-gate-shadow.service, daemon-reload applied. Gate: Saturday 2026-04-25 02:30 UTC natural fire reaches EndOfRun before SIGTERM. If 24h budget also insufficient: engineering conversation on parallelism / per-cid Gamma caching / cohort reduction, not another timeout raise.
-- [ ] CB-FLIP-GATE-TIER3-CRITERIA (ACTIVE, MED, gates Tier-3 decision) — WORKSPACE framing 'if Tier-3 also nulls: retire CB-FLIP-GATE apparatus' was written assuming Tier-1's retention test. Nightly is admission-filter, not retention. Need to sharpen pass/fail criterion before Saturday's full-cohort result lands: candidate frame 'of flip-filter-admitted candidates at threshold T, forward 30-day P&L exceeds flip-filter-rejected candidates by X% at n>=Y; else null'. Decide X, Y, T values before consuming Saturday's output. Do not reuse Tier-1 null logic.
+- [ ] CB-FLIP-GATE-TIER3-CRITERIA (PRE-COMMITTED 2026-04-24 late, gates Sunday analysis) — Criterion locked before Saturday 02:30 UTC gate-fire to prevent reverse-reasoning from data. Details:
+  * Treatment vs control: admitted-cohort (flip_filter_at_T=True) vs rejected-cohort (False) per threshold T in {0.20, 0.25, 0.30, 0.35, 0.40}.
+  * Forward window: 30 days from Saturday's gate-fire timestamp; evaluation runs ~2026-05-25.
+  * Outcome measure: source-wallet 30-day realized P&L (via profiler API on the Saturday snapshot wallet list). Shadow-mode precludes own-P&L observation on rejected candidates.
+  * Cohort freeze: Saturday's 3906-wallet jsonl snapshot is the evaluation list, regardless of downstream re-score/cull/rotation.
+  * Pass bar (all must hold):
+    (1) At >=3 of 5 thresholds: admitted median 30d forward P&L exceeds rejected median by BOTH Mann-Whitney p<0.05 AND (admitted >= 1.5x rejected OR admitted positive while rejected negative).
+    (2) Cohort sizes >=30 on each side at every threshold evaluated.
+    (3) Monotonicity (stricter threshold -> larger gap) is corroborating signal but NOT required for pass.
+  * Null verdict consequence: RETIRE CB-FLIP-GATE apparatus. Not tune, not extend window — retire. Tier-1 null + Tier-3 null = filter has no discriminatory value at either admission or retention end.
+  * Sunday analysis session (2026-04-26 or later) implements this criterion against Saturday's output + snapshot wallet list. The session must cite this TODO by ID before computing anything.
+- [ ] CB-FLIP-GATE-TIER3-SNAPSHOT (ACTIVE, HIGH, fires Saturday 2026-04-25 after ~20:00 UTC) — Freeze cohort artifacts for Sunday's TIER3 analysis BEFORE they are rewritten by normal operations. Actions: (a) cp /opt/copybot/data/flip_gate_shadow.jsonl /opt/copybot/data/flip_gate_shadow_tier3_snapshot_20260425.jsonl after gate run completes (~20:00 UTC Saturday if 17h runtime estimate holds; sooner if gate hits EOF earlier). (b) Save a frozen copy of the candidates list as it was at 02:30 UTC Saturday — if ScoutBot's 03:01 UTC rewrite has already overwritten the original, reconstruct from the jsonl's wallet-addresses field (each gate record carries the wallet that was scored, so the wallet list IS derivable from the jsonl itself — no separate snapshot strictly required, but archive anyway for traceability). Label both files with the _tier3_snapshot_YYYYMMDD suffix.
+- [ ] CB-FLIP-GATE-TIER3-ANALYSIS (SCHEDULED for 2026-05-25 or later) — Consume Saturday 2026-04-25 gate output + 30d-forward source-wallet P&L against pre-committed CB-FLIP-GATE-TIER3-CRITERIA. Input files: /opt/copybot/data/flip_gate_shadow.jsonl (Saturday records) + candidates_pending_review.json snapshot frozen Saturday. Compute Mann-Whitney per threshold, effect-size comparison, monotonicity check. Output: pass/fail verdict with supporting distributions. DO NOT open the jsonl or wallet list before 2026-05-25; freezing the cohort is only meaningful if we don't peek.
 - [ ] CB-FLIP-GATE-TRACEABILITY (LOW, opportunistic) — flip_gate_shadow.jsonl records carry no run_ts or input-file hash. candidates_pending_review.json is rewritten nightly (~03:01 UTC, 31 min into the gate run) so sequential-night runs can score different universes with no cross-reference. Fix: emit one header-record per run with run_ts + sha256(input_file) + wallet_count at jsonl start. One-line addition. Grab on next flip_gate_shadow.py touch.
 
 ### Shelved CopyBot tracks (closed this session)

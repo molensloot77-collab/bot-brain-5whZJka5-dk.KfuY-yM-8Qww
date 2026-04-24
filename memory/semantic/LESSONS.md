@@ -335,3 +335,17 @@ Actual state: BigW had intentionally renamed the repo on GitHub for privacy-thro
 Also: privacy-through-obscurity only works if the obscure name is the only one used. Leaving the guessable name in docs as a "fallback" or for "readability" broadcasts exactly the thing the rename was meant to hide. Surface-area hygiene matters.
 
 Surfaced 2026-04-24 when the rename was reconfirmed as intentional. Fix applied same session: all active URLs in /root/.agent/ updated, brain git remote updated, session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md updated with an explicit "do not revert" note.
+
+## 2026-04-24 (late) — Pre-commit pass/fail criteria BEFORE observing outcome data
+
+For any evaluation where pass/fail verdict matters (gate validation, paper-to-live promotion, strategy go/no-go), the criterion must be locked before the outcome data is visible. Not "drafted before" — locked, with specific thresholds, specific effect sizes, specific statistical tests, specific cohort-size requirements. Committed to WORKSPACE with checkbox open, referenced by ID from the session that later consumes the data.
+
+Reason: once the data is visible, human reasoning drifts toward interpretations that confirm whichever way the data leans. "It's a pass because p=0.07 which is close enough" or "it's a fail because the effect size was only 1.3x and I wanted 1.5x" are both rationalized decisions that the pre-commitment would have rendered clean.
+
+Mechanism: pre-commitment is a WORKSPACE entry with the checkbox [ ] open, containing all specific numbers (thresholds, effect sizes, p values, cohort minimums). The analysis session that consumes the data cites the TODO by ID BEFORE any computation begins. If the criterion needs loosening after seeing the data, that's a second decision requiring its own pre-commitment and explicit BigW approval — not a quiet drift inside the analysis session.
+
+**Surfaced 2026-04-24 late:** CB-FLIP-GATE-TIER3-CRITERIA locked before Saturday 02:30 UTC gate-fire. Forward window 30d, source-wallet P&L measure, Mann-Whitney p<0.05 + 1.5x-or-sign-flip effect size, >=30 per cohort at each of 5 thresholds, >=3 of 5 thresholds pass. Null verdict retires the apparatus, not tunes it. Sunday analysis session must cite this TODO's criterion before computing anything.
+
+**Generalizes to:** any paper→live gate, backtest verdict, filter validation, or wallet-cull decision. Write the pass bar before running the numbers. If the pass bar feels arbitrary writing it, that discomfort is the signal that you don't actually know what pass means — figure that out BEFORE computing, because afterward you'll know what the data says and convince yourself that was always the bar.
+
+Related: LESSONS "NOISE_BET validation correction" (2026-04-22) is the same class of failure from the other direction — interpreting filter performance on a sample that doesn't support the interpretation. Pre-commitment would have caught that by requiring a non-firing control group in the pass criterion.
