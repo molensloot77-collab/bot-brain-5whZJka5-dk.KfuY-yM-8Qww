@@ -223,5 +223,5 @@ the current state of the files it points to.
 
 ---
 
-*Last updated: 2026-04-23 by Claude Code (CB-CULL-POSTMORTEM session).
+*Last updated: 2026-04-24 by Claude Code (INFRA-REPO-RENAME-PROPAGATE session).
 Commit hash in bot-brain git log is authoritative.*

@@ -1,7 +1,7 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-24 (Friday, late, INFRA-REPO-RENAME-PROPAGATE)
-Updated by: Claude Code (rename propagation session)
+Last updated: 2026-04-24 (Friday, end-of-day, RENAME-PROPAGATE close-out)
+Updated by: Claude Code (RENAME-PROPAGATE close-out session)
 Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
@@ -74,6 +74,7 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] INFRA-SERVICE-RENAME (DEFER, LOW) — Rename `polybot-harvester.service` → `copybot-harvester.service`. The unit is real CopyBot infrastructure (ExecStart=/opt/copybot/harvester.py) but the historical name suggests retired PolyArb. Update references in morning.sh:56, morning.sh:62, evening_updater.py:51, evening_updater.py:303. Group with INFRA-VENV-MIGRATION when next touching systemd.
 - [ ] HUB-ORPHAN-AUDIT scope expansion (existing TODO, expanded 2026-04-24) — In addition to `/opt/hub/healthcheck.py` (already known orphan): (1) `/opt/copybot/hub_dashboard.py` is an orphan duplicate of `/opt/hub/hub_dashboard.py` (live one is served by hub-dashboard.service); both now have TABS=['copybot','scout'], but the duplicate should be deleted. (2) `/opt/copybot/fix_watchlist.py` has a pre-existing Python syntax error at line 126 (bash-style escapes inside Python string) — file is broken at parse time, suggesting it has not been invoked in a long time; candidate for deletion. (3) `/opt/copybot/wallet_monitor.py` was the ExecStart of the now-removed polybot-copymon.service — confirm it is not invoked elsewhere, then delete.
 - [x] INFRA-BRAIN-MIRROR-FRESHNESS (DONE 2026-04-24) — raw.githubusercontent.com edge-cache lag surfaced during session close→open on 2026-04-24 (commits d0429fa/0855d57/9168330 invisible to new-session fetch for ~5 min). Fix: session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md now use GitHub Contents API for cache-bypassed reads. LESSONS entry "Mirror freshness: raw CDN vs API" documents the general rule. Raw URLs retained as rate-limit fallback.
+- [ ] INFRA-REMOTE-REGRESSION-SMOKE (LOW, opportunistic) — add one-line check to /root/evening.sh to fail loudly if brain git remote regresses off the obfuscated canonical: `git -C /root/.agent remote get-url origin | grep -q "bot-brain-5whZJka5-dk.KfuY-yM-8Qww" || echo "REMOTE_REGRESSED: $(git -C /root/.agent remote get-url origin)" >&2`. Rationale: from commit 13ab8f1 forward, any push via legacy bot-brain URL signals regression. Grab on next evening.sh touch.
 
 **Pre-existing:**
 - [ ] HUB-ORPHAN-AUDIT — /opt/hub/ files possibly orphaned. /opt/hub/healthcheck.py confirmed orphan.
