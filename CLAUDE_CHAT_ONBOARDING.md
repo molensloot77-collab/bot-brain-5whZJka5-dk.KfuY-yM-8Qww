@@ -27,7 +27,7 @@ SERVER (root@204.168.154.197 Hetzner Helsinki HEL1)
 │   ├── skills/<name>/SKILL.md              ← reusable workflows (morning-check,
 │   │                                          evening-close, strategic-review)
 │   ├── skills/_index.md                    ← skill registry + trigger phrases
-│   └── .git                                ← mirrored to github.com/molensloot77-collab/bot-brain
+│   └── .git                                ← mirrored to github.com/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww
 │
 ├── /root/docs/                ← operational docs repo. Morning briefs,
 │                                 session logs, evening.sh. Also git-backed. SECONDARY.
@@ -41,7 +41,7 @@ SERVER (root@204.168.154.197 Hetzner Helsinki HEL1)
 └── /opt/{copybot,weatherbot,…}/            ← bot codebases + their own logs
 
 GITHUB (mirror)
-└── github.com/molensloot77-collab/bot-brain  ← PUBLIC repo. Receives nightly push
+└── github.com/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww  ← PUBLIC repo. Receives nightly push
                                                 of /root/.agent/ when BigW runs
                                                 evening.sh. This is your read target.
 
@@ -64,8 +64,10 @@ URLs are for fallback only when the Contents API rate-limits (60/hr
 unauthenticated). LESSONS "Mirror freshness: raw CDN vs API" (2026-04-24)
 documents this in detail.
 
-Base URL (Contents API): `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/`
-Fallback (raw, 5-min stale window): `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/`
+Base URL (Contents API): `https://api.github.com/repos/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/contents/`
+Fallback (raw, 5-min stale window): `https://raw.githubusercontent.com/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/main/`
+
+The obfuscated suffix is intentional (privacy-through-obscurity on a public repo). Do NOT "correct" it back to `bot-brain`; that's the legacy redirect name and its presence in docs defeats the rename.
 
 Read at session start in this order — bail out of any file after the first
 screen if nothing looks new-to-you:
@@ -90,9 +92,9 @@ included in the conversation. To give Claude Chat current brain state at
 session start, BigW should paste the following URLs at the start of every
 session (or reference this section):
 
-- WORKSPACE: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/working/WORKSPACE.md`
-- LESSONS: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/semantic/LESSONS.md`
-- SESSION_LOG: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/episodic/session_log.jsonl`
+- WORKSPACE: `https://api.github.com/repos/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/contents/memory/working/WORKSPACE.md`
+- LESSONS: `https://api.github.com/repos/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/contents/memory/semantic/LESSONS.md`
+- SESSION_LOG: `https://api.github.com/repos/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/contents/memory/episodic/session_log.jsonl`
 
 (Raw fallback for rate-limit cases: replace `api.github.com/repos/<repo>/contents/` with `raw.githubusercontent.com/<repo>/main/`.)
 
@@ -126,7 +128,7 @@ non-trivial decisions).
 - **The mirror can therefore be up to ~36 hours behind on any given read.**
   A mid-day Claude Chat session sees the prior evening's state, not today's.
 - To check freshness, look at the GitHub repo's latest commit timestamp
-  (`https://github.com/molensloot77-collab/bot-brain/commits/main`) or
+  (`https://github.com/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/commits/main`) or
   WORKSPACE.md's `Last updated` header.
 - If BigW says "this was done today" and the mirror doesn't reflect it,
   the mirror is right — today's work hasn't been pushed yet. Don't assume

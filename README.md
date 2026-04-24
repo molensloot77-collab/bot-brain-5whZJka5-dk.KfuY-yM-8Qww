@@ -14,7 +14,7 @@ git add -A
 git commit -m "initial brain scaffold — migrated from userMemories 2026-04-18"
 
 # Optional: push to private repo for off-server backup
-# git remote add origin git@github.com:molensloot77-collab/bot-brain.git
+# git remote add origin git@github.com:molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww.git
 # git push -u origin master
 ```
 

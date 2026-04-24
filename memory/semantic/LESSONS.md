@@ -321,3 +321,15 @@ This is exactly the BUY_HOLD-blind bug class the fix addresses. The Phase 1 sani
 **Surfaced 2026-04-24:** session close pushed 3 brain commits (d0429fa / 0855d57 / 9168330). New Claude Chat session opened within ~5 min, fetched WORKSPACE from raw URL, got 2026-04-23 content — missing all three today commits. `git log origin/main..HEAD` confirmed pushes landed cleanly. Pure edge-cache lag. No infrastructure failure.
 
 **Fix applied same day:** session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md updated to use the Contents API. Raw URLs preserved as rate-limit fallback (Contents API is 60/hr unauthenticated).
+
+### 2026-04-24 (late) — Correction to INFRA-PUSH-RELIABILITY postmortem
+
+The Apr 23 INFRA-PUSH-RELIABILITY postmortem asserted that the canonical brain-repo URL is `molensloot77-collab/bot-brain`, and treated an earlier Claude Chat write that added an obfuscation suffix to the URL as an error to be corrected. Both conclusions were wrong.
+
+Actual state: BigW had intentionally renamed the repo on GitHub for privacy-through-obscurity before the Apr 23 session. The new canonical is `bot-brain-5whZJka5-dk.KfuY-yM-8Qww`. `bot-brain` is a legacy-redirect name preserved by GitHub. The "obfuscation suffix" Claude Chat added was the LLM correctly reading the post-rename canonical; the Apr 23 correction that stripped it was a regression disguised as a fix.
+
+**Reusable lesson:** Before postmorteming a URL as "wrong", verify the current state of the resource with the owning authority (here: GitHub's HTTP response on the old name should have surfaced a 301 during the Apr 23 session). A confident-sounding "we know the canonical" without a live check is the same class of failure as schema-lifecycle mismatch — we asserted a fact from memory when the authority had moved on.
+
+Also: privacy-through-obscurity only works if the obscure name is the only one used. Leaving the guessable name in docs as a "fallback" or for "readability" broadcasts exactly the thing the rename was meant to hide. Surface-area hygiene matters.
+
+Surfaced 2026-04-24 when the rename was reconfirmed as intentional. Fix applied same session: all active URLs in /root/.agent/ updated, brain git remote updated, session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md updated with an explicit "do not revert" note.

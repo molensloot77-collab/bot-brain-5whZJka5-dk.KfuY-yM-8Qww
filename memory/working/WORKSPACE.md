@@ -1,7 +1,7 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-24 (Friday, late PM, CB-FLIP-GATE-TIMEOUT-V2 + corrections)
-Updated by: Claude Code (CB-FLIP-GATE-TIMEOUT-V2 session)
+Last updated: 2026-04-24 (Friday, late, INFRA-REPO-RENAME-PROPAGATE)
+Updated by: Claude Code (rename propagation session)
 Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
@@ -82,7 +82,7 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] Cost watch — 5 CC sessions on CopyBot today contributed to MTD $79.19 (528% over target). Tomorrow: single well-scoped CC session per bot, not sequential loops.
 
 **Added 2026-04-23:**
-- [x] INFRA-CHAT-ONBOARDING (DONE) — orientation doc at /root/.agent/CLAUDE_CHAT_ONBOARDING.md. Brain mirror base URL: https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/
+- [x] INFRA-CHAT-ONBOARDING (DONE) — orientation doc at /root/.agent/CLAUDE_CHAT_ONBOARDING.md. Brain mirror base URL: https://raw.githubusercontent.com/molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww/main/
 - [x] INFRA-PUSH-RELIABILITY (DONE 2026-04-23) — No infrastructure issue. Apr 20/21/22 evening.sh pushes all landed on origin/main cleanly (commits 2e4ac5b, 2344c72, 4c17c6a, ea06965). Mirror content matches origin/main exactly. Claude Chat's morning claim of 'Apr 18 content on mirror' was a misread of WORKSPACE's self-reported 'Last updated: 2026-04-18' header line (which itself had drifted from file state because session writers hadn't refreshed it). Actual mirror content was Apr 21. Softer finding: WORKSPACE's 'Last updated' header must be refreshed on every write, or it drifts from file state and becomes itself a source of confusion. See LESSONS entry 'Record-integrity patterns'.
 - [ ] SCT-AUTO-880 (INVESTIGATE, MED) — API-robustness playbook for Polymarket activity API. Today's Mode B Phase 2 had 6/144 urllib failures (4%) requiring retry with longer timeouts; Phase 5 had no failures but the threshold isn't characterized. Small probe session: instrument a few profile calls, characterize failure modes (throttle / transient / persistent), document a standard retry/throttle pattern for future sessions.
 - [ ] SCT-AUTO-906 (INVESTIGATE, LOW) — gensyn-delphi-skills REST API compatibility with py_clob_client. One-session probe: check their docs, compare signatures, report overlap.
@@ -93,6 +93,8 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] SCT-881-RECOVERY (DEFER, LOW) — Optional: HTTP-fetch polymarket.com/0x594edb9112f... to recover the full 40-char wallet address. If recovered: profile against standing LESSONS.md gates (MIN_RESOLVED=30, NOT FAVORITE_BUYER, price_band_rate≥30%); if passes, consider --add. Only pursue if wallet is independently interesting — no action warranted just because SCT-AUTO-881 surfaced it.
 
 ## Recent decisions (last 7 days)
+
+- 2026-04-24 late: INFRA-REPO-RENAME-PROPAGATE executed. bot-brain renamed to bot-brain-5whZJka5-dk.KfuY-yM-8Qww (intentional, privacy-through-obscurity, BigW action predating Apr 23). All active URLs in /root/.agent/ migrated; brain remote.origin.url updated; LESSONS correction to Apr 23 INFRA-PUSH-RELIABILITY postmortem filed. `bot-brain` legacy redirect preserved by GitHub but no longer referenced in docs/configs.
 
 - 2026-04-24: CB-HARVESTER-BUYHOLD Phase 2 (PRODUCER) shipped to /opt/copybot. Four commits (6fa877f wallet_profiler producer, 738ab4d rescore persistence + flag log, 140af19 diagnostic tool, 4839dd7 AGENT.md). 8 new attribution fields populated when CB_BUYHOLD_ATTR_PRODUCER=1; consumer flag stays OFF until Phase 3 (separate session). Acceptance: byte-identical pre-Phase-2 output with flag OFF on 3 wallets (0xc8d9c0 rich, 0x77d326 proxy, 0xfd4263 mid); flag-ON populated 8 fields with sane values. Watchlist restored from /tmp/sports_watchlist_pre_buyhold_20260424.json (md5 22e63b62...) so Sunday's natural pass is the first coherent full-watchlist write. Drop-in staged at /etc/systemd/system/copybot-rescore.service.d/buyhold-attr.conf — BigW activates via daemon-reload when ready. KEY FINDING during acceptance: pair-matched-rich proxy wallet's profiler_resolved_pnl ($2,158) was SUBSTANTIALLY LOWER than legacy profiler_net_pnl ($62,268) — initial alarm proved to be the new attribution working correctly: legacy missed -$60k of held-to-resolution losses that the new fallback path catches. Exactly the BUY_HOLD-blind bug class the structural fix addresses. Confirms Risk R4 (use profiler_resolved_pnl not profiler_total_pnl_attr for gates) and Risk R1 (proxy/EOA mismatch handled via mismatch fallback). Phase 1 design report unchanged. Session log: /root/docs/session_logs/20260424_CHAT_CB_HARVESTER_BUYHOLD_phase2_session.md.
 
