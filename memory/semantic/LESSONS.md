@@ -253,3 +253,34 @@ final value matches the intended formula. "CB-SIZING-FIX landed" and
 
 * **LLM-emitted commands need syntactic validation before they land.** When an LLM produces machine-executable output (shell commands, API calls, SQL), prose hedges in the output text are not a substitute for a post-generation gate. Surfaced 2026-04-23: ScoutBot's auto_ingestor.py emitted `harvester.py --add 0x594edb91` (10 chars, invalid) alongside the hedge "(full address required)" — the LLM caught the problem, then wrote the row anyway. A 42-char hex regex between generation and persistence would have blocked it. Prompt engineering compounds unreliability; syntactic gates don't.
 
+
+---
+
+## Retirement methodology
+
+### 2026-04-24 — Retirement requires three actions, not one
+
+When retiring a service or component, the operation is not "stop" — it is "stop AND disable AND remove unit file." Surfaced 2026-04-24: the Apr 8 PolyArb retirement stopped polybot.service but left polybot-paper.service, polybot-arb2.service, polybot-delta-exec.service, polybot-tgnotify.service, polybot-watchdog.service in `enabled` state. They were inactive at runtime but would have auto-started on the next reboot. INFRA-RETIRE-CLEANUP caught this 16 days later only because Phase 0 audit explicitly listed `is-enabled` per unit — `is-active` alone would have shown them all clean.
+
+**Reusable rule:** "Stopped" describes runtime state. "Enabled" describes boot state. A retirement that only addresses runtime state is incomplete and creates a latent reactivation hazard. Standard retirement checklist:
+1. systemctl stop <unit>
+2. systemctl disable <unit>
+3. rm /etc/systemd/system/<unit>
+4. systemctl daemon-reload
+5. (Document in retirement notice + brain.)
+
+**Generalizes to:** anywhere "active state" and "configured state" are tracked separately — cron commented vs deleted, scheduled job paused vs removed, feature flag set false vs feature code deleted. Always sweep both.
+
+### 2026-04-24 — Build shared infrastructure with names that won't lie
+
+When one of N bots eventually retires, any shared infrastructure named after that bot becomes a structural lie. Surfaced 2026-04-24: `/opt/polybot/venv/` is the shared Python venv for CopyBot, NewsBot's venv parent, hub healthcheck, and ~25 systemd units + crons. `polybot-harvester.service` is actually CopyBot's harvester. Both were named when PolyArb was the lead bot; both became misleading the day PolyArb retired.
+
+**Reusable rule:** Shared infrastructure (venvs, environment files, common config dirs, generic services like a harvester or a notifier) goes under generic names from day one — `/opt/_shared/venv/`, `/etc/systemd/system/<actual-consumer>.service`. Bot-specific names go to bot-specific resources only. The discipline pays off the first time any bot retires.
+
+**Cost of getting this wrong:** an INFRA-VENV-MIGRATION TODO + an INFRA-SERVICE-RENAME TODO that someone has to schedule and execute later, or live with permanent confusion in onboarding.
+
+### 2026-04-24 — Audit the file name, not just the bot name
+
+Phase 0 audit of INFRA-RETIRE-CLEANUP greped for `weatherbot|krajek|polybot|polyarb` strings across active surfaces. It missed three runtime readers/writers of `AllBots_TODO_CURRENT.md` in `/opt/scoutbot/` because the audit looked for retired-bot *names*, not the file *name* about to be deleted. Caught at the pre-deletion grep gate (Task 1.5), required a mid-session insert (Tasks 1.4e–1.4i, ~30 min) to redirect ScoutBot to `SCOUTBOT_INBOX.md`. Without the gate, ScoutBot's nightly run at Sat 02:00 UTC would have crashed, generating phantom morning-brief alerts and potentially data loss in the SCT-AUTO promotion path.
+
+**Reusable rule:** When auditing for "what depends on X before deletion", grep for X's *file name* and *path*, not just for the *concept* X represents. The two greps surface different sets. Concept greps catch usage in code logic; path greps catch readers/writers.
