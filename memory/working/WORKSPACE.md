@@ -1,7 +1,7 @@
 # Workspace — Live Task State
 
-Last updated: 2026-04-24 (Friday, mid-UTC, MAXPAGES followup)
-Updated by: Claude Code (CB-HARVESTER-BUYHOLD-MAXPAGES TODO addition)
+Last updated: 2026-04-24 (Friday, mid-UTC, MIRROR-FRESHNESS fix)
+Updated by: Claude Code (INFRA-BRAIN-MIRROR-FRESHNESS close)
 Session-start paste template: /root/.agent/session_start_paste.md (BigW copies content at start of every new Claude Chat session)
 
 ## Current focus
@@ -68,6 +68,7 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [ ] INFRA-VENV-MIGRATION (DEFER, MED) — Relocate shared Python venv from `/opt/polybot/venv/` to `/opt/_shared/venv/` (or `/opt/venv/`). Update ~25 references in systemd units, crons, scripts. Estimated 1 dedicated session. Unblocks: full archival of `/opt/polybot/` to `/opt/_retired/`.
 - [ ] INFRA-SERVICE-RENAME (DEFER, LOW) — Rename `polybot-harvester.service` → `copybot-harvester.service`. The unit is real CopyBot infrastructure (ExecStart=/opt/copybot/harvester.py) but the historical name suggests retired PolyArb. Update references in morning.sh:56, morning.sh:62, evening_updater.py:51, evening_updater.py:303. Group with INFRA-VENV-MIGRATION when next touching systemd.
 - [ ] HUB-ORPHAN-AUDIT scope expansion (existing TODO, expanded 2026-04-24) — In addition to `/opt/hub/healthcheck.py` (already known orphan): (1) `/opt/copybot/hub_dashboard.py` is an orphan duplicate of `/opt/hub/hub_dashboard.py` (live one is served by hub-dashboard.service); both now have TABS=['copybot','scout'], but the duplicate should be deleted. (2) `/opt/copybot/fix_watchlist.py` has a pre-existing Python syntax error at line 126 (bash-style escapes inside Python string) — file is broken at parse time, suggesting it has not been invoked in a long time; candidate for deletion. (3) `/opt/copybot/wallet_monitor.py` was the ExecStart of the now-removed polybot-copymon.service — confirm it is not invoked elsewhere, then delete.
+- [x] INFRA-BRAIN-MIRROR-FRESHNESS (DONE 2026-04-24) — raw.githubusercontent.com edge-cache lag surfaced during session close→open on 2026-04-24 (commits d0429fa/0855d57/9168330 invisible to new-session fetch for ~5 min). Fix: session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md now use GitHub Contents API for cache-bypassed reads. LESSONS entry "Mirror freshness: raw CDN vs API" documents the general rule. Raw URLs retained as rate-limit fallback.
 
 **Pre-existing:**
 - [ ] HUB-ORPHAN-AUDIT — /opt/hub/ files possibly orphaned. /opt/hub/healthcheck.py confirmed orphan.

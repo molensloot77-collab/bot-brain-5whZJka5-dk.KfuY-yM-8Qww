@@ -309,3 +309,15 @@ Investigation showed it was correct behavior: the wallet has many unmatched-buy 
 This is exactly the BUY_HOLD-blind bug class the fix addresses. The Phase 1 sanity-check intuition was wrong: pair-matched-rich wallets can have very different new vs legacy P&L if they hold-to-resolution at all. The correct sanity check: profiler_realized_ratio + open_positions count + proxy_fallback_hits together tell whether the wallet has structurally different P&L profile than the legacy scorer can see.
 
 **Reusable rule:** when writing acceptance tests for a fix, the sanity expectations must NOT assume the bug doesn't exist. Test outputs that "look like the legacy" prove the new implementation copies the bug. Test outputs that DIVERGE from legacy in the predicted direction prove the new implementation surfaces what was hidden. Build the divergence into the test: pick at least one wallet where you expect the new and old to disagree, and verify they do.
+
+### 2026-04-24 — Mirror freshness: raw CDN vs API
+
+"Brain mirror = sole source of truth" has one failure mode: reads within ~5 min of a write can return stale content. `raw.githubusercontent.com` caches unauthenticated raw-file responses at edge nodes with variable TTL. Different edges can show different versions during the window.
+
+**Reusable rule:** for fresh-push-then-read scenarios (session close → session open), use the GitHub Contents API (`api.github.com/repos/.../contents/...`), not raw URLs. The API returns base64-encoded content with commit SHA metadata; it's cache-bypassed (or uses much shorter TTL) and includes freshness evidence. Raw URLs are for bulk reads where a 5-min staleness window is acceptable.
+
+**Generalizes to:** any "eventually-consistent CDN with aggressive edge caching" — GitHub raw, S3 static hosting, Cloudflare Pages, Netlify Functions cache. If the read happens seconds-to-minutes after a write, expect to see stale content from a fraction of requests. When correctness matters, read from the source-of-record API, not the edge-cached mirror.
+
+**Surfaced 2026-04-24:** session close pushed 3 brain commits (d0429fa / 0855d57 / 9168330). New Claude Chat session opened within ~5 min, fetched WORKSPACE from raw URL, got 2026-04-23 content — missing all three today commits. `git log origin/main..HEAD` confirmed pushes landed cleanly. Pure edge-cache lag. No infrastructure failure.
+
+**Fix applied same day:** session_start_paste.md + CLAUDE_CHAT_ONBOARDING.md updated to use the Contents API. Raw URLs preserved as rate-limit fallback (Contents API is 60/hr unauthenticated).

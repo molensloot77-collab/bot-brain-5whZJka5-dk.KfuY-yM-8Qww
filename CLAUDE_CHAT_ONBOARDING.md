@@ -56,7 +56,16 @@ DEPRECATED — do NOT trust
 
 The brain is mirrored at a **public** GitHub repo. No auth needed.
 
-Base URL: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/`
+**Use the GitHub Contents API, not raw URLs.** Why: `raw.githubusercontent.com`
+caches at edge nodes with ~5 min TTL, so reads within minutes of a push can
+return stale content. The Contents API (`api.github.com/repos/.../contents/...`)
+is cache-bypassed and includes a `.sha` field for freshness traceability. Raw
+URLs are for fallback only when the Contents API rate-limits (60/hr
+unauthenticated). LESSONS "Mirror freshness: raw CDN vs API" (2026-04-24)
+documents this in detail.
+
+Base URL (Contents API): `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/`
+Fallback (raw, 5-min stale window): `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/`
 
 Read at session start in this order — bail out of any file after the first
 screen if nothing looks new-to-you:
@@ -81,9 +90,11 @@ included in the conversation. To give Claude Chat current brain state at
 session start, BigW should paste the following URLs at the start of every
 session (or reference this section):
 
-- WORKSPACE: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/working/WORKSPACE.md`
-- LESSONS: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/semantic/LESSONS.md`
-- SESSION_LOG: `https://raw.githubusercontent.com/molensloot77-collab/bot-brain/main/memory/episodic/session_log.jsonl`
+- WORKSPACE: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/working/WORKSPACE.md`
+- LESSONS: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/semantic/LESSONS.md`
+- SESSION_LOG: `https://api.github.com/repos/molensloot77-collab/bot-brain/contents/memory/episodic/session_log.jsonl`
+
+(Raw fallback for rate-limit cases: replace `api.github.com/repos/<repo>/contents/` with `raw.githubusercontent.com/<repo>/main/`.)
 
 Claude Chat's first action each session: fetch WORKSPACE.md and LESSONS.md
 to orient on current state. **Do not trust the MORNING_BRIEF.md
