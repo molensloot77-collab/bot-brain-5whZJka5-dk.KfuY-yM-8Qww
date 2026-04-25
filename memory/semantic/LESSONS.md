@@ -488,3 +488,52 @@ step protected this session — `list-timers` returned `infinity` rather than
 the asserted 2026-05-02 because the catch-up fire was already running.
 Without that verification, the prompt would have asserted timing that did
 not match reality.
+
+## 2026-04-25 — IDE caches flood audit greps; same family as gitignore'd-dirs-hidden-from-greps, opposite direction
+
+Audit greps suffer from two symmetric scope-divergence failures: the
+intended scope can be smaller than the search hit-set (noise floods
+the result), or larger than the search hit-set (real references hide
+in skipped paths). Both failures are silent — the grep returns "answers"
+that look authoritative but aren't.
+
+Surfaced 2026-04-25 (HUB-ORPHAN-AUDIT, follow-on to 2026-04-24
+INFRA-BRAIN-REPO-NAME-AUDIT lesson "audit greps must bypass
+ignore-files"): a reference scan for `wallet_monitor` across `/opt/`
+and `/root/` returned heavy noise from VS Code's `.vscode-server/data/`
+IDE caches — file-content snapshots and search indexes that are
+neither source of truth nor live infrastructure. The real references
+(`patch_mon5`, `patch_scan11`, AGENT.md rule) were buried in cache
+hits. Operator filtered manually to find them.
+
+The Apr 24 lesson was: respect-gitignore caused audit greps to skip
+real source paths (`memory/working/SCOUTBOT_INBOX.md` was gitignored,
+hid bare repo references). Today's failure is the inverse: a search
+that didn't filter IDE caches drowned real references in build
+artifacts and editor metadata.
+
+**Two-direction rule:**
+
+1. **Audit greps must include real source paths the operator might have
+   excluded** (gitignore, .ripgrepignore, find -prune defaults). Use
+   `--no-ignore` or equivalent.
+2. **Audit greps must exclude paths that are not source of truth** (IDE
+   caches, build artifacts, language-server indexes, virtualenv site-
+   packages, node_modules, `__pycache__`, `.git/`). Use targeted
+   `--exclude-dir=` or restrict to known-source directory roots.
+
+Symmetric failure modes need both rules. A grep that gets one right
+without the other is still wrong. Concretely for this codebase:
+grep -rn --no-ignore 
+--exclude-dir=.git --exclude-dir=pycache 
+--exclude-dir=.vscode-server --exclude-dir=node_modules 
+--exclude-dir=venv --exclude-dir=_retired 
+'<pattern>' /opt/ /root/ /etc/systemd/ /etc/cron.d/ /var/spool/cron/
+
+The exact exclusion list will vary; the principle is that audit greps
+need explicit scope on *both* ends.
+
+**Generalizes to:** any tool that returns "matches across a directory
+tree" — find, fd, ag, ripgrep, sourcegraph queries, IDE-wide find. Same
+class for code-search via LSP or Sourcegraph: the index covers what it
+covers, which is rarely exactly what the audit intends.
