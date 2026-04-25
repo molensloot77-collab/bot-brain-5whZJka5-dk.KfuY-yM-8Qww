@@ -328,7 +328,7 @@ This is exactly the BUY_HOLD-blind bug class the fix addresses. The Phase 1 sani
 
 ### 2026-04-24 (late) — Correction to INFRA-PUSH-RELIABILITY postmortem
 
-The Apr 23 INFRA-PUSH-RELIABILITY postmortem asserted that the canonical brain-repo URL is `molensloot77-collab/bot-brain`, and treated an earlier Claude Chat write that added an obfuscation suffix to the URL as an error to be corrected. Both conclusions were wrong.
+The Apr 23 INFRA-PUSH-RELIABILITY postmortem asserted that the canonical brain-repo URL is `molensloot77-collab/bot-brain-5whZJka5-dk.KfuY-yM-8Qww`, and treated an earlier Claude Chat write that added an obfuscation suffix to the URL as an error to be corrected. Both conclusions were wrong.
 
 Actual state: BigW had intentionally renamed the repo on GitHub for privacy-through-obscurity before the Apr 23 session. The new canonical is `bot-brain-5whZJka5-dk.KfuY-yM-8Qww`. `bot-brain` is a legacy-redirect name preserved by GitHub. The "obfuscation suffix" Claude Chat added was the LLM correctly reading the post-rename canonical; the Apr 23 correction that stripped it was a regression disguised as a fix.
 
@@ -351,3 +351,46 @@ Mechanism: pre-commitment is a WORKSPACE entry with the checkbox [ ] open, conta
 **Generalizes to:** any paper→live gate, backtest verdict, filter validation, or wallet-cull decision. Write the pass bar before running the numbers. If the pass bar feels arbitrary writing it, that discomfort is the signal that you don't actually know what pass means — figure that out BEFORE computing, because afterward you'll know what the data says and convince yourself that was always the bar.
 
 Related: LESSONS "NOISE_BET validation correction" (2026-04-22) is the same class of failure from the other direction — interpreting filter performance on a sample that doesn't support the interpretation. Pre-commitment would have caught that by requiring a non-firing control group in the pass criterion.
+
+## 2026-04-24 — Repo-name discipline + GitHub redirect leak
+
+Hardened repo names (security-through-obscurity for public repos containing
+sensitive content) have one structural failure mode: GitHub auto-redirects
+from any prior name to the current canonical name. The redirect is HTTP 200
+with the canonical URL in the response — so a single `curl -I` of a bare
+pre-hardening URL leaks the hardened name to anyone who finds the bare URL.
+
+**Reusable rule:** server-side discipline is the only place obfuscation can
+be enforced. Audit and redact every artifact on the server that could leak
+the bare/pre-hardened form. Accept that public git history (commits, old
+pushed content) cannot be retroactively cleaned without rewrite-and-force-
+push, which itself signals "interesting repo here" to anyone watching.
+
+**Threat-model honesty:** for public GitHub repos, name obfuscation is
+hygiene, not defense. Real security comes from:
+- No private keys / API secrets in the repo
+- No content that becomes weaponizable when paired with the public-action
+  data already on-chain
+- Treat the obfuscation as raising the cost of casual discovery, not
+  blocking determined inspection
+
+**Pattern for runtime references:** runtime scripts (cron, services) read
+the URL from `git -C <repo> remote get-url origin` — single source of truth
+in `.git/config`. Hardcoded URLs in scripts mean URL rotation requires a
+multi-file edit; indirection means it's a one-line `git remote set-url`.
+Static docs (LESSONS, MORNING_BRIEF, session-start paste) keep hardcoded
+URLs because their purpose is human-readable copy-paste.
+
+**Surfaced 2026-04-24:** session_start_paste.md update (commit 6dc7710,
+INFRA-BRAIN-MIRROR-FRESHNESS) introduced bare-URL references during
+the API-vs-raw fix. Audit found 16 bare references across 7 files,
+including the morning.sh cron fetcher (which was succeeding via redirect,
+silently). Fixed in INFRA-BRAIN-REPO-NAME-AUDIT same day.
+
+**Bug class:** every previous "fix" today (INFRA-RETIRE-CLEANUP, INFRA-
+BRAIN-MIRROR-FRESHNESS) introduced or preserved bare-URL references that
+the producer was content to ship and the consumer was content to redirect-
+follow. Pattern: when the wrong-but-functional path silently works, the
+bug accumulates across multiple sessions until something forces explicit
+inspection (here: the API rate-limit hitting on the 4th distinct file
+request, exposing the redirect chain).
