@@ -10,6 +10,39 @@
 3. Accepted items: copy to WORKSPACE.md "Open tasks by bot" with appropriate priority.
 4. Rejected items: log to scout_quality_log.md with reason.
 5. After triage, remove the row from this file's "Pending items" section.
+| SCT-AUTO-935 | CopyBot | Extract wallet address from the referenced Polymarket account in this thread and run `python3 harvester.py --add {wal... | — | ACTIVE | — | 7.9 | 2026-04-25 |
+| SCT-AUTO-936 | CopyBot | Define a behavioral pattern rule in CopyBot's wallet scoring for pre-resolution concentration in low-liquidity weathe... | — | ACTIVE | — | 7.9 | 2026-04-25 |
+| SCT-AUTO-937 | CopyBot | Flag to WeatherBot maintainer: physical sensor manipulation is a plausible NOAA data integrity attack vector — assess... | — | ACTIVE | — | 7.9 | 2026-04-25 |
+| SCT-AUTO-938 | CopyBot | Extract wallet address from the referenced thread and run `python3 harvester.py --add {wallet}` — validate on-chain P... | — | ACTIVE | — | 7.8 | 2026-04-25 |
+| SCT-AUTO-939 | CopyBot | If on-chain P&L confirms >= $200K, flag wallet for CopyBot basket consensus (MON-5) as NICHE_SPECIALIST (split-featur... | — | ACTIVE | — | 7.8 | 2026-04-25 |
+| SCT-AUTO-940 | CopyBot | Assess whether CopyBot's current inclusion pipeline misclassifies split-feature traders due to near-zero cost basis d... | — | ACTIVE | — | 7.8 | 2026-04-25 |
+| SCT-AUTO-941 | CopyBot | Extract wallet address from thread and run `python3 harvester.py --add {wallet}` — validate on-chain deposit size, en... | — | ACTIVE | — | 7.3 | 2026-04-25 |
+| SCT-AUTO-942 | CopyBot | Audit MON-36 / RULE 22 contradiction guard to determine whether a short-window all-in-then-reverse sequence on a fres... | — | ACTIVE | — | 7.3 | 2026-04-25 |
+| SCT-AUTO-943 | ALL | Benchmark `polyfill-rs` vs. `py_clob_client` on `market_is_tradeable` and `get_best_ask` call latency under live Poly... | — | ACTIVE | — | 7.2 | 2026-04-25 |
+| SCT-AUTO-944 | ALL | Assess PyO3 FFI binding feasibility for exposing `polyfill-rs` market data functions to the Python bot suite's hot pa... | — | ACTIVE | — | 7.2 | 2026-04-25 |
+| SCT-AUTO-945 | ALL | If FFI binding is feasible, evaluate KrajekBot's 15m price drift check as a secondary integration candidate after Pol... | — | ACTIVE | — | 7.2 | 2026-04-25 |
+| SCT-AUTO-946 | ALL | Review five-agent LLM ensemble voting architecture in `muxprotocol/kalshi-trading-bot` for applicability to CopyBot's... | — | ACTIVE | — | 7.2 | 2026-04-25 |
+| SCT-AUTO-947 | ALL | Audit fractional Kelly criterion implementation for cross-market position sizing validation — determine whether it ca... | — | ACTIVE | — | 7.2 | 2026-04-25 |
+| SCT-AUTO-948 | CopyBot | Audit size capping and safety rail logic in `figure-markets/polymarket-copy-trading-bot` for compatibility and gap an... | — | ACTIVE | — | 7.1 | 2026-04-25 |
+| SCT-AUTO-949 | CopyBot | Review portfolio tracking and performance history methodology for trader classification — assess whether scoring or w... | — | ACTIVE | — | 7.1 | 2026-04-25 |
+| SCT-AUTO-950 | CopyBot | Cross-validate contradiction detection logic against CopyBot's RULE 22 implementation — determine whether the referen... | — | ACTIVE | — | 7.1 | 2026-04-25 |
+| SCT-AUTO-951 | ALL | Audit EIP-712 signing implementation in `signum` against the bot suite's current order-signing and key management app... | — | ACTIVE | — | 6.2 | 2026-04-25 |
+| SCT-AUTO-952 | ALL | Cross-reference `signum`'s Rust/Python execution bridge pattern against SCT-AUTO-944 PyO3 feasibility assessment — de... | — | ACTIVE | — | 6.2 | 2026-04-25 |
+| SCT-AUTO-953 | ALL | Establish a lightweight Chainlink release-watch process — flag any future release changelog entries referencing oracl... | — | ACTIVE | — | 6.0 | 2026-04-25 |
+| SCT-AUTO-954 | CopyBot | Extract wallet address associated with @bored2boar Twitter account; run `python3 harvester.py --add {wallet_address}`... | — | ACTIVE | — | 5.8 | 2026-04-25 |
+| SCT-AUTO-955 | CopyBot | If on-chain P&L on the @megaeth TGE market exceeds 30% ROI with confirmed pre-announcement entry, flag @bored2boar as... | — | ACTIVE | — | 5.8 | 2026-04-25 |
+| SCT-AUTO-956 | ALL | Verify Polymarket perps availability and liquidity via API — confirm whether perps order flow is accessible programma... | — | ACTIVE | — | 5.7 | 2026-04-25 |
+| SCT-AUTO-957 | ALL | If SCT-AUTO-956 confirms accessible perps liquidity, evaluate whether a perps hedging layer should be introduced into... | — | ACTIVE | — | 5.7 | 2026-04-25 |
+| SCT-AUTO-958 | CopyBot | Review WebSocket order book refresh implementation in `Elshen7/PolymarketBot` — assess whether its streaming cadence ... | — | ACTIVE | — | 5.6 | 2026-04-25 |
+| SCT-AUTO-959 | CopyBot | Evaluate two-leg arb state machine architecture for structural patterns applicable to CopyBot's MON-5 basket consensu... | — | ACTIVE | — | 5.6 | 2026-04-25 |
+| SCT-AUTO-960 | CopyBot | Run `python3 harvester.py --add 0x5b6331e7ff0831a3fe2ed12004747db1a9c911a4` to ingest neutralwave23's trade history; ... | — | ACTIVE | — | 5.4 | 2026-04-25 |
+| SCT-AUTO-961 | CopyBot | If SCT-AUTO-960 confirms ≥3 winning markets with consistent category concentration and no single trade accounting for... | — | ACTIVE | — | 5.4 | 2026-04-25 |
+| SCT-AUTO-962 | ALL | If a multi-venue expansion roadmap is formally initiated, evaluate SocialPredict's API surface, liquidity depth, and ... | — | ACTIVE | — | 5.3 | 2026-04-25 |
+| SCT-AUTO-963 | CopyBot | Run `python3 harvester.py --add 0x84cfffc3f16dcc353094de30d4a45226eccd2f63` to ingest mooseborzoi's trade history; pu... | — | ACTIVE | — | 5.2 | 2026-04-25 |
+| SCT-AUTO-964 | CopyBot | If SCT-AUTO-963 confirms ≥3 winning markets with consistent category concentration and no single trade accounting for... | — | ACTIVE | — | 5.2 | 2026-04-25 |
+| SCT-AUTO-965 | ALL | Retrieve and review the arbitrage guide linked in @kirillk_web3's post — assess whether it covers Kalshi/Polymarket o... | — | ACTIVE | — | 5.1 | 2026-04-25 |
+| SCT-AUTO-966 | CopyBot | Run `python3 harvester.py --add 0x6ac5bb06a9eb05641fd5e82640268b92f3ab4b6e` to ingest Lakersfan111's trade history; v... | — | ACTIVE | — | 5.1 | 2026-04-25 |
+| SCT-AUTO-967 | CopyBot | If SCT-AUTO-966 confirms realized P&L dominance, ≥3 winning markets with consistent category concentration, and no si... | — | ACTIVE | — | 5.1 | 2026-04-25 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
