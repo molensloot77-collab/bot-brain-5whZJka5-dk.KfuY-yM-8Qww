@@ -394,3 +394,37 @@ follow. Pattern: when the wrong-but-functional path silently works, the
 bug accumulates across multiple sessions until something forces explicit
 inspection (here: the API rate-limit hitting on the 4th distinct file
 request, exposing the redirect chain).
+
+## 2026-04-24 — Audit greps must bypass ignore-files
+
+Surfaced during INFRA-BRAIN-REPO-NAME-AUDIT Phase 0: the initial `grep -rIn`
+call was actually routed through a shell wrapper using ugrep with `--ignore-files`
+behavior. /root/.gitignore excludes `docs/` and `.claude/`. Result: Phase 0
+silently undercounted bare references — files in /root/docs/ were invisible
+to the audit until the wrapper was bypassed.
+
+**Reusable rule:** for audits — anything where the question is "where does
+X appear in this filesystem?" — use `command grep` (or `\grep`, or an
+explicit absolute path) to bypass aliases and shell wrappers that may
+apply ignore-file behavior. Tools that respect .gitignore (ugrep,
+ripgrep with default config, git grep) work correctly for development
+greps but hide content from audits.
+
+**Generalizes to:** any tool that has a "be smart about what's interesting"
+default behavior. Audits explicitly want every match, including in files
+the development workflow has classified as boring.
+
+**Concrete pattern for audits:**
+  - `command grep -rIn 'pattern' /root /opt /etc 2>/dev/null`
+  - or: `find ... -exec grep ...`
+  - NOT: shell-aliased `grep` if any alias or wrapper exists
+
+**Test the audit's audit:** before declaring scope complete, sanity-check
+the count by running with a different tool (find + grep, or python with
+glob) and comparing. Discrepancies between two methods reveal exactly this
+ignore-file class of bug.
+
+**Bug-class:** silent undercount in audits. Adjacent to "the file state
+is not what its self-reported header says" (2026-04-23 Record-integrity
+patterns) — same family of "tool defaults make the right answer harder
+to find than the wrong one."
