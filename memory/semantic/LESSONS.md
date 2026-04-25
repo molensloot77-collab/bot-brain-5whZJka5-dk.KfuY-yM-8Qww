@@ -257,6 +257,8 @@ final value matches the intended formula. "CB-SIZING-FIX landed" and
 
 * **systemd drop-ins and unit files activate on the next daemon-reload anywhere on the system, not on an intended "activation" action.** Writing a file to `/etc/systemd/system/<name>.service.d/` or `/etc/systemd/system/` and intending to run daemon-reload later is functionally indistinguishable from activating immediately, because any unrelated session that edits any other unit and runs daemon-reload will pick up the pending file. "Staged, not activated" is a mental model that breaks at the first cross-session unit edit, not a safety state. Two rules: (1) treat a drop-in or unit file landing on `/etc/systemd/system/` as live; activation timing is determined by the next daemon-reload from any source, not by human intent. (2) When the activation moment matters (e.g. coordinating with an upstream run, confirming cohort freshness), gate on the service's next start — timer fire, manual start — not on daemon-reload. A drop-in that shouldn't be active must stay outside `/etc/systemd/system/` (e.g. in `/tmp/` or a staging directory) until the actual activation moment. Surfaced 2026-04-24: CB-HARVESTER-BUYHOLD Phase 2 drop-in at /etc/systemd/system/copybot-rescore.service.d/buyhold-attr.conf (mtime Apr 24 08:49 UTC) was merged into effective config by an unrelated CB-FLIP-GATE-TIMEOUT-V2 daemon-reload mid-afternoon the same day; the "explicit BigW activation" daemon-reload that evening was a no-op. Same pattern as CB-FLIP-GATE shadow timer (staged at /tmp/ on Apr 21, moved to /etc/systemd/system/ on Apr 22, asserted "not enabled" in WORKSPACE until 2026-04-24 while actually firing nightly since Apr 22).
 
+* **Content-addressed SHA over session-handoff narration.** When a message claims a file's content changed (commits landed, "your stale copies," "rewritten today") but the content-addressed SHA returned by the GitHub Contents API is unchanged, trust the SHA. File blob SHAs are content-derived — if a single byte differs, the SHA differs. Equal SHA on the same `?ref=main` query means the file on `main` is byte-for-byte identical to the prior fetch, regardless of what any narration asserts. Surfaced 2026-04-25: a session re-orientation message claimed three commits had touched WORKSPACE.md and LESSONS.md after an initial fetch and instructed a re-fetch as "stale." Both API responses returned identical SHAs (00436aa... and 4b9084d...) and identical sizes. Investigation deferred to BigW (commits may have existed on a non-main branch, or touched other files entirely). Two rules: (1) when a handoff message and the API disagree, the API wins for "what is on main right now"; raise the discrepancy explicitly rather than re-fetching as if stale. (2) Session-handoff prose is human-memory-derived and subject to drift between events ("which files did I edit") and recall ("which files I claim I edited") — same failure mode as the Apr 23 "File state vs content assertion" lesson but inverted: there the file content lied about its own freshness; here the narration lied about the file's freshness. Generalizes: any time a content-addressed identifier (git blob SHA, content hash, ETag) is available alongside a narrative claim, the identifier is the cheaper and more reliable signal.
+
 
 ---
 
@@ -428,3 +430,61 @@ ignore-file class of bug.
 is not what its self-reported header says" (2026-04-23 Record-integrity
 patterns) — same family of "tool defaults make the right answer harder
 to find than the wrong one."
+
+## 2026-04-25 — `systemctl start <timer>` after suppression replays missed fires when `Persistent=true`
+
+A timer unit with `Persistent=true` records each missed scheduled fire and,
+on the next `start`, executes a catch-up immediately for the most recent
+missed fire. This is correct behavior for the "machine was off, run what we
+missed" use case, but is wrong for the "suppress this one fire, resume normal
+schedule next cycle" workflow.
+
+Surfaced 2026-04-25: copybot-flip-gate-shadow.timer was `stop`'d Friday to
+suppress Sat 02:30 UTC fire (after the manual 10:55 UTC run brought work
+forward); Saturday `start` at 09:56:38 UTC immediately fired the catch-up
+the suppression was designed to avoid. Snapshot artifact preserved (taken
+24 seconds before resume), so the cohort-freeze goal survived; the
+suppression goal did not.
+
+**Two rules:**
+
+1. When planning to suppress a single timer fire and resume, check the unit
+   for `Persistent=` first — `false` (or absent, default `false`) makes
+   start-after-stop safe; `true` makes it equivalent to running the missed
+   fire on resume.
+2. "Stop the timer" and "skip this fire" are not the same operation under
+   `Persistent=true`. Correct ways to skip a fire under `Persistent=true`:
+   `systemctl mask <unit>` for the window then `unmask` after the scheduled
+   time has passed (the masked unit can't run, so the missed-fire record
+   gets cleaned by the next `OnCalendar` evaluation), or run the service
+   manually inside the suppression window so the fire is "satisfied"
+   not "missed."
+
+**Generalizes to any catch-up-on-resume scheduler:** cron with `anacron`
+semantics; k8s CronJobs with `concurrencyPolicy: Allow` and a
+`startingDeadlineSeconds` longer than the suppression window; etc.
+
+## 2026-04-25 — Verify systemd unit cadence before asserting "next fire" timing
+
+When drafting a prompt that commits to a specific next-fire timestamp ("next
+fire = 2026-05-02 02:30 UTC"), the cadence (`OnCalendar=`) and the catch-up
+policy (`Persistent=`) of the timer must be read from the unit, not inferred
+from prose memory of the workflow.
+
+Surfaced 2026-04-25: a Saturday-sequence prompt asserted next fire would be
+one week out from a suppressed Saturday fire ("weekly schedule"). The actual
+unit was `OnCalendar=*-*-* 02:30:00` (daily) with `Persistent=true`, so the
+prompt's stated expectation diverged from the unit's behavior in two
+independent ways.
+
+Same failure-mode family as 2026-04-24 "systemd drop-ins activate on the
+next daemon-reload anywhere" — systemd's behavior is determined by the unit
+file, not by what the operator believes about the unit.
+
+**Rule:** any prompt that includes a "verify next fire = <timestamp>" check
+must derive that timestamp from `systemctl cat <unit>` plus the `Persistent=`
+setting plus current time, not from prior session prose. The verification
+step protected this session — `list-timers` returned `infinity` rather than
+the asserted 2026-05-02 because the catch-up fire was already running.
+Without that verification, the prompt would have asserted timing that did
+not match reality.
