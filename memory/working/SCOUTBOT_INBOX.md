@@ -43,6 +43,25 @@
 | SCT-AUTO-965 | ALL | Retrieve and review the arbitrage guide linked in @kirillk_web3's post — assess whether it covers Kalshi/Polymarket o... | — | ACTIVE | — | 5.1 | 2026-04-25 |
 | SCT-AUTO-966 | CopyBot | Run `python3 harvester.py --add 0x6ac5bb06a9eb05641fd5e82640268b92f3ab4b6e` to ingest Lakersfan111's trade history; v... | — | ACTIVE | — | 5.1 | 2026-04-25 |
 | SCT-AUTO-967 | CopyBot | If SCT-AUTO-966 confirms realized P&L dominance, ≥3 winning markets with consistent category concentration, and no si... | — | ACTIVE | — | 5.1 | 2026-04-25 |
+| SCT-AUTO-968 | ALL | Obtain official Polymarket migration announcement, target timeline, and new chain RPC/API specs — confirm chain ident... | — | ACTIVE | — | 8.2 | 2026-04-26 |
+| SCT-AUTO-969 | ALL | Once specs are available, audit all five bots for hard-coded or Polygon-assumed dependencies — gas estimation logic (... | — | ACTIVE | — | 8.2 | 2026-04-26 |
+| SCT-AUTO-970 | ALL | Assess cross-chain liquidity fragmentation risk during the transition window — model the impact on PolyArb oracle lag... | — | ACTIVE | — | 8.2 | 2026-04-26 |
+| SCT-AUTO-971 | CopyBot | Run `python3 harvester.py --add 0x2dc13c6bda81b202281e796953a7323de675b33c` to ingest xifutloong3's trade history; pu... | — | ACTIVE | — | 7.2 | 2026-04-26 |
+| SCT-AUTO-972 | CopyBot | Run `python3 harvester.py --add 0x91583ceb1ebec79951a068e1d7d02c1ea590fa7b` to ingest GlobalizeTheHorchata's trade hi... | — | ACTIVE | — | 6.9 | 2026-04-26 |
+| SCT-AUTO-973 | CopyBot | Run `python3 harvester.py --add 0x375191b48ef5761e0c621b8e4a5374e964937dfd` to ingest bondfolio's trade history; vali... | — | ACTIVE | — | 6.9 | 2026-04-26 |
+| SCT-AUTO-974 | CopyBot | Run `python3 harvester.py --add 0xefddbb135e2cc2648e3ca6a6b3d4fa4994d5017f` to ingest maxgreen's trade history; valid... | — | ACTIVE | — | 6.6 | 2026-04-26 |
+| SCT-AUTO-975 | CopyBot | Run `python3 harvester.py --add 0xc97485a44146b5db0b8b121358f57cf297cdb33b` to ingest lu1zzz's trade history; validat... | — | ACTIVE | — | 6.6 | 2026-04-26 |
+| SCT-AUTO-976 | CopyBot | Run `python3 harvester.py --add 0x21f333307ac6d2e65ac82f014b3dd2b64cbc35e3` to ingest hi774c's trade history; validat... | — | ACTIVE | — | 6.5 | 2026-04-26 |
+| SCT-AUTO-977 | CopyBot | Run `python3 harvester.py --add 0xdd92232bcdfbbac04132b3cbacbf32c2e5b16b2a` to ingest Jdhdhduu's trade history; valid... | — | ACTIVE | — | 6.3 | 2026-04-26 |
+| SCT-AUTO-978 | CopyBot | Run `python3 harvester.py --add 0x12ec6d71325afac2b4d25b3de94185e2c48d41ae` to ingest olegio's trade history; validat... | — | ACTIVE | — | 6.2 | 2026-04-26 |
+| SCT-AUTO-979 | CopyBot | Run `python3 harvester.py --add 0x39d3c773be30fcc73161fc6768f46d563a779ef0` to ingest matanovik's trade history; vali... | — | ACTIVE | — | 6.1 | 2026-04-26 |
+| SCT-AUTO-980 | CopyBot | Run `python3 harvester.py --add 0xa38a455bbdd4b68486548b7e19da99903f4f821d` to ingest takeormake's trade history; val... | — | ACTIVE | — | 6.1 | 2026-04-26 |
+| SCT-AUTO-981 | CopyBot | Run `python3 harvester.py --add 0xb652e5dabc3fccd3c939acab0108f99866842db4` to ingest trade history; validate realize... | — | ACTIVE | — | 5.8 | 2026-04-26 |
+| SCT-AUTO-982 | CopyBot | Run `python3 harvester.py --add 0x54d200bbe9f87704e0aa0839178187e36f41ac37` to ingest trade history; validate realize... | — | ACTIVE | — | 5.8 | 2026-04-26 |
+| SCT-AUTO-983 | CopyBot | Reach out to @LunarResearcher to clarify the green-column filtering metric (profitability ratio, ROI, volume-adjusted... | — | ACTIVE | — | 5.6 | 2026-04-26 |
+| SCT-AUTO-984 | CopyBot | Run `python3 harvester.py --add 0x9495425feeb0c250accb89275c97587011b19a27` to ingest trade history; validate realize... | — | ACTIVE | — | 5.4 | 2026-04-26 |
+| SCT-AUTO-985 | ALL | Review figure-markets/polymarket-arbitrage-bot commits from 2026-01 to 2026-04 for edge refinements in BTC/ETH/SOL/XR... | — | ACTIVE | — | 5.0 | 2026-04-26 |
+| SCT-AUTO-986 | ALL | Monitor FundingPredicts launch timeline and TVL growth; if TVL exceeds $1M, reassess spread and liquidity conditions ... | — | ACTIVE | — | 5.0 | 2026-04-26 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
