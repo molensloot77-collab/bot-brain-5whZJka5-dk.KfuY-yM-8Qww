@@ -62,6 +62,28 @@
 | SCT-AUTO-984 | CopyBot | Run `python3 harvester.py --add 0x9495425feeb0c250accb89275c97587011b19a27` to ingest trade history; validate realize... | — | ACTIVE | — | 5.4 | 2026-04-26 |
 | SCT-AUTO-985 | ALL | Review figure-markets/polymarket-arbitrage-bot commits from 2026-01 to 2026-04 for edge refinements in BTC/ETH/SOL/XR... | — | ACTIVE | — | 5.0 | 2026-04-26 |
 | SCT-AUTO-986 | ALL | Monitor FundingPredicts launch timeline and TVL growth; if TVL exceeds $1M, reassess spread and liquidity conditions ... | — | ACTIVE | — | 5.0 | 2026-04-26 |
+| SCT-AUTO-987 | CopyBot | Analyze opinion-whale-tracker source for wallet-discovery and pre-repricing detection patterns reusable in Polymarket... | — | ACTIVE | — | 8.0 | 2026-04-27 |
+| SCT-AUTO-988 | CopyBot | Assess Opinion market (BNB Chain) liquidity depth and CLOB structure; if average daily volume and spread conditions a... | — | ACTIVE | — | 8.0 | 2026-04-27 |
+| SCT-AUTO-989 | CopyBot | Run `python3 harvester.py --add 0x951bd740ef` to ingest full trade history; validate realized vs. unrealized P&L spli... | — | ACTIVE | — | 7.6 | 2026-04-27 |
+| SCT-AUTO-990 | CopyBot | Retrieve and analyze @bored2boar's published strategy documentation for replicable edge patterns (entry timing logic,... | — | ACTIVE | — | 7.6 | 2026-04-27 |
+| SCT-AUTO-991 | ALL | Review Kronos foundation model architecture and training signal composition in alex-jb/orallexa-ai-trading-agent; ass... | — | ACTIVE | — | 7.2 | 2026-04-27 |
+| SCT-AUTO-992 | ALL | Compare Bull/Bear/Judge adversarial consensus implementation against CopyBot's MON-5 consensus gates; determine wheth... | — | ACTIVE | — | 7.2 | 2026-04-27 |
+| SCT-AUTO-993 | CopyBot | Run `python3 harvester.py --add 0x4bff30af91642dc7d2b19a8664378fe55c45fc26` to ingest full trade history for Sassy-Bu... | — | ACTIVE | — | 7.1 | 2026-04-27 |
+| SCT-AUTO-994 | ALL | Evaluate kalshi-neural-predictor accuracy metrics (Brier score, log-loss) and feature engineering approach; determine... | — | ACTIVE | — | 7.0 | 2026-04-27 |
+| SCT-AUTO-995 | ALL | Assess generalization gap between Kalshi and Polymarket market structure (resolution rules, user base, liquidity prof... | — | ACTIVE | — | 7.0 | 2026-04-27 |
+| SCT-AUTO-996 | CopyBot | Run `python3 harvester.py --add 0xaa075924e1dc7cff3b9fab67401126338c4d2125` to ingest full trade history for rustin; ... | — | ACTIVE | — | 6.6 | 2026-04-27 |
+| SCT-AUTO-997 | CopyBot | Run `python3 harvester.py --add 0x72d815133f9f8b6529e911cf3be492846ce05213` to ingest full trade history for Vatrer; ... | — | ACTIVE | — | 6.5 | 2026-04-27 |
+| SCT-AUTO-998 | CopyBot | Run `python3 harvester.py --add 0xf705fa045201391d9632b7f3cde06a5e24453ca7` to ingest full trade history; validate re... | — | ACTIVE | — | 6.5 | 2026-04-27 |
+| SCT-AUTO-999 | CopyBot | Run `python3 harvester.py --add 0xbf3020eb8556e5ec402dbdda2fedbc0da7788b95` to ingest full trade history for REWGTD; ... | — | ACTIVE | — | 6.4 | 2026-04-27 |
+| SCT-AUTO-1000 | ALL | Analyze LunarResearcher's YES+NO sum detection logic — extract threshold parameters and trigger conditions from the t... | — | ACTIVE | — | 6.3 | 2026-04-27 |
+| SCT-AUTO-1001 | ALL | Review atomic dual-side execution implementation described in the thread; assess whether PolyArb's current execution ... | — | ACTIVE | — | 6.3 | 2026-04-27 |
+| SCT-AUTO-1002 | ALL | Audit PolyArb's oracle lag assumptions for BTC markets — determine whether the current model accounts for a ~5-minute... | — | ACTIVE | — | 5.7 | 2026-04-27 |
+| SCT-AUTO-1003 | ALL | Run live feed delta comparison between Chainlink BTC price resolution and Binance/Coinbase spot at 1-minute granulari... | — | ACTIVE | — | 5.7 | 2026-04-27 |
+| SCT-AUTO-1004 | CopyBot | Run `python3 harvester.py --add 0xe5b70fd855af9258d9463992e4f1ed7987905ee3` to ingest full trade history for alwaysfa... | — | ACTIVE | — | 5.4 | 2026-04-27 |
+| SCT-AUTO-1005 | CopyBot | Run `python3 harvester.py --add 0x92b5f14c68ccae0cd7d0ba52b098ffaab990fec6` to ingest full trade history for Schnoodl... | — | ACTIVE | — | 5.4 | 2026-04-27 |
+| SCT-AUTO-1006 | CopyBot | Run `python3 harvester.py --add 0xdf17f4a8dd01a4cfa6fc3da323a2baee5f8697d1` to ingest full trade history for Clear-Co... | — | ACTIVE | — | 5.4 | 2026-04-27 |
+| SCT-AUTO-1007 | ALL | Audit all public-facing dashboards and API endpoints across the full bot suite — verify access is restricted to authe... | — | ACTIVE | — | 5.1 | 2026-04-27 |
+| SCT-AUTO-1008 | ALL | Review operational security posture for remote or mobile access scenarios — determine whether team members access liv... | — | ACTIVE | — | 5.1 | 2026-04-27 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
