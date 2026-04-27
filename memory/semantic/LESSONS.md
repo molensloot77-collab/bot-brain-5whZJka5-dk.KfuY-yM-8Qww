@@ -537,3 +537,31 @@ need explicit scope on *both* ends.
 tree" — find, fd, ag, ripgrep, sourcegraph queries, IDE-wide find. Same
 class for code-search via LSP or Sourcegraph: the index covers what it
 covers, which is rarely exactly what the audit intends.
+
+## 2026-04-27 — `git add -A` in non-brain repos masks unrelated index state
+
+Surfaced via 250c696 (Phase 3 morning session). The rule "per-file git add outside /root/.agent" is not enforceable when scripts use `-A`. Two fixes available: enumerate writers in script (preferred — explicit dependency on which files are touched), or pre-commit status check that aborts if more files staged than expected. evening.sh step 2/4 currently uses `git add -A` in /root/docs; INFRA-EVENING-SCOPE TODO captures the patch. Pattern generalizes: any automated script that commits to a shared repo needs explicit scoping, not blanket staging. **Session-level corollary (added same day after second occurrence):** index state can leak even when explicit `git add <file>` is used — if a prior `M` file was already staged, the new `add` joins the existing index. Two collateral commits in one session (250c696 in /root/docs, e604f6b in /root/.agent) both followed this pattern. The defense is `git status --short` immediately *before* the add to surface unexpected staged files, not after the commit. Rule applies regardless of repo (brain or otherwise) and regardless of whether `-A` or per-file `add` is used.
+
+## 2026-04-27 — Log naming is not always date-suffixed
+
+Surfaced when `/opt/copybot/logs/rescore_*2026-04-26*` glob returned empty despite Sunday SCAN-7 successfully writing to `/opt/copybot/logs/rescore.log` (no date in filename). Forensic rule: when looking for "today's log," `ls -lat | head` is more robust than date-globbing because logging conventions vary (date-suffixed, rotated-on-size, append-only with no date marker). Date-globbing carries an assumption about log naming that should be checked first.
+
+## 2026-04-27 — Paper-mode metrics are not live-mode metrics
+
+The Apr 22 sizing-ceiling LESSONS entry computed median bet $0.31 from paper-mode signals; the live floor at activity_monitor.py:1289-1290 is bypassed in paper mode (`if not paper_mode and bet_size < MIN_LIVE_BET_USD`). Conclusions drawn from paper-mode bet distributions about "what live would do" require explicitly applying live-mode logic to the paper records — observed paper bet size != projected live bet size. Pattern: any "what would live behavior be" question against paper-mode data must re-apply live logic at audit time, not assume paper distribution maps to live.
+
+## 2026-04-27 — Sample-slice direction matters
+
+`records[:200]` after `tail -n 10000 file` returns the *oldest* 200 of the sample, not the freshest. For schema-presence checks (e.g. "does this field exist in current records?"), slice from the end (`records[-200:]`). The audit error here was a schema-detection negative ("intent-like keys found: NONE") that turned out to be wrong because the field was added after the oldest 200 records were written.
+
+## 2026-04-27 — Falsification of an old LESSONS entry deserves explicit documentation, not silent supersession
+
+Today's CB-SIZING-CEILING audit demonstrated that the 2026-04-22 thesis ("median bet $0.31, fix didn't propagate") was wrong because of paper-mode artifact. The fix is to document the falsification (memory edit, FALSIFIED.md candidate, or LESSONS amendment) AND link back to downstream priorities that were affected. Three CopyBot priorities were demoted on the basis of the Apr 22 thesis (CB-BACKTEST-TIER3, CB-BACKTEST-RES-TS, CB-FLIP-GATE) — those decisions need re-examination, not just forward correction. Pattern: when a LESSONS entry is falsified, the supersession should be explicit and downstream-traceable, not implicit.
+
+## 2026-04-27 — `min(legacy, resolved)` gating does not catch wallets where both metrics agree but open-book exposure invalidates the agreement
+
+The 0xaa075924e1 case (Apr 27 Phase 3 magnifier audit) shows a wallet passing both pnl metrics with realized_ratio 0.11 — meaning the agreement itself is uninformative because both metrics are blind to the same thing (open-book MTM exposure). Currently-copied T2 wallet, resolved +$604K, MTM -$4.86M, 330 open positions. A future gate variant may need to read profiler_realized_ratio as a confidence weighting, not just min(legacy, resolved) as a magnitude filter. Pattern generalizes: when two metrics agree because they share a blindspot, the agreement does not reduce uncertainty about the underlying thing.
+
+## 2026-04-27 — When the brain explicitly references a file's path elsewhere, that path is data, not assumption fodder
+
+Apr 27 morning session: assumed evening.sh was in /root/ despite WORKSPACE explicitly listing morning.sh:56,62 and evening_updater.py:51,303 in the INFRA-SERVICE-RENAME TODO, all of which run from /root/docs/. Cost: one round-trip for path correction. Pattern: when reasoning about file locations, search the brain for prior path references before assuming — they're usually there.
