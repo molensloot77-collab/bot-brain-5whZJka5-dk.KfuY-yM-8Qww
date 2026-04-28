@@ -22,21 +22,3 @@ If any fetch fails (permission error, 404, etc.), stop and tell me. Don't procee
 
 ---
 **Note (added 2026-04-28):** This template was changed from GitHub Contents API URLs to `raw.githubusercontent.com` with a cache-buster query parameter. Contents API was empirically observed to serve stale blob SHAs (returning the Friday 2026-04-24 version of WORKSPACE.md when the actual file had been updated Monday 2026-04-27 and was current at origin/main). Contents API has its own cache layer that does not respond to standard cache-bypass hints. The raw URL + `?cb=<unix_ts>` pattern reliably returns current content. See LESSONS 2026-04-28.
-
-## Standing pre-tasks
-
-Every Claude Code block must run this Task 0 verbatim before any other work.
-Hard fail if the inbox file is missing — do NOT silently fall through.
-
-    INBOX=/root/.agent/memory/working/SCOUTBOT_INBOX.md
-    if [ ! -f "$INBOX" ]; then
-        echo "FATAL: inbox missing at $INBOX — investigate before proceeding"
-        exit 1
-    fi
-    grep "$(date '+%Y-%m-%d')" "$INBOX" || echo "no SCT-AUTO items today (file present, no matches)"
-
-History: the prior Task 0 pattern pointed at /opt/scoutbot/SCOUTBOT_INBOX.md
-(stale path since 2026-04-24 inbox move) and used a silent-echo fallback,
-which masked the missing-file error. ~95 SCT-AUTO items across the
-2026-04-24 to 2026-04-28 blind window were incorrectly cleared as "none today."
-Surfaced in session 2026-04-28 ~06:08 UTC. See SCT-AUTO-1001 for full context.

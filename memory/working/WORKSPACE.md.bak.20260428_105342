@@ -19,6 +19,7 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 - [x] CB-MONTHLY-REVIEW-BUYHOLD (DONE 2026-04-23) — Resolved via BATCH2B-MODE-B Phase 1. Patched monthly_watchlist_review.py classify() with BUY_HOLD exemption: wallets where sell_count==0 AND buy_count_30d>10 now return KEEP_BUYHOLD_EXEMPT instead of INACTIVE_CULL'ing on the closed<30 AND days_active>60 branch. Uses all-time sell_count as conservative proxy (profiler doesn't expose sell_count_30d). Telemetry tag "buyhold_exempt" distinguishes from generic "thin_sample" keeps. Provisional bridge until CB-HARVESTER-BUYHOLD delivers structural pair-independent edge measurement. py_compile PASS; 11/11 unit tests PASS; dry-run on 33 WATCHLIST_ONLY entries clean (0 accidental flips). Report: /opt/copybot/logs/cb_mode_b_restore_execution_20260423.md §1.
 - [ ] CB-MARTINGALE-WATCH-0x8a81855d — monitor for n≥50 or single-loss >$5. Current: 77.3% WR n=22 +$1.80 paper, on-chain flag -$32K Martingale.
 - [ ] CB-DECAY-MONITOR re-eval — ~Apr 25 with fresh post-demote cohort. [2026-04-24 note: tomorrow's re-eval should defer or be pre-gated on CB-DECAY-BUYHOLD-AUDIT findings. Current decay-monitor is BUY_HOLD-blind suspected — running it against a fresh paper cohort may repeat the 0x2c1bf2a1 class of error. BigW decision.]
+- [ ] Sunday 06:00 UTC auto-rescore (SCAN-7) — Apr 26 is the next fire.
 - [ ] CB-DEDUP-REPEAT open (MED priority) — watch for 0xafbacaeeda-style repeats.
 
 **Added 2026-04-23:**
@@ -74,10 +75,14 @@ Session-start paste template: /root/.agent/session_start_paste.md (BigW copies c
 ### NewsBot
 - [ ] May 7 extended go/no-go gate (was Apr 22 — extended due to 0 settled trades)
 - [ ] Fuzzy dedup fix (9.8% duplicate leak)
-- [x] burst debounce (DONE — shipped at 60s in commit 60b450f, env-override NEWSBOT_DEBOUNCE_S; original 30s spec tightened to 60s; verified 2026-04-28)
-- [x] `datetime.utcnow()` deprecation fix (DONE 2026-04-13, commit 30105d8 in /opt/newsbot — verified 2026-04-28)
+- [ ] 30s burst debounce (48% calls <10s apart)
+- [ ] `datetime.utcnow()` deprecation fix in `pipeline.py:78`
 
-### WeatherBot — RETIRED 2026-04-22. Throughput ceiling ~$3-5/mo, architecture valid, no successor. See /opt/_retired/ and project_weatherbot_retired.md.
+### WeatherBot
+- [ ] Apr 22 WB-RESUME go/no-go — tomorrow's first gate
+- [ ] Apr 22 WB-29 city divergence prior gate — tomorrow's second gate
+- [ ] WB-30 (paper_settler fix) — first task next WeatherBot session
+- [ ] SCT-AUTO-822 (9.0) — audit `/opt/weatherbot/noaa_scanner.py` against v3.8.0 `openapi.json`
 
 ### ScoutBot
 - [ ] SCT-2 Reddit API approval still pending (submitted Mar 30)
@@ -253,82 +258,4 @@ Fix B (option a — always-fresh field refresh):
 **Evidence:** /opt/copybot/data/phase3/validation_run_20260428.jsonl (44 records)
 combined with /opt/copybot/logs/phase3_active_demote_cohort_20260427.json
 (Apr 27 snapshot). Drift quantification reproducible from these two files.
-
-
-
----
-
-## INFRA-WORKSPACE-DRIFT-AUDIT — spawned 2026-04-28
-
-**Status:** PARKED for dedicated session. HIGH priority but not urgent.
-
-**Trigger:** Tier 1+2 arc on 2026-04-28 verified 5 WORKSPACE items against
-actual /opt/newsbot/, /opt/copybot/, /opt/_retired/ state. Result: 3 of 5
-items (60%) were already shipped or otherwise resolved but never marked.
-Stale items so far this session: WeatherBot section, SCAN-7 cron line,
-NewsBot datetime.utcnow(), NewsBot 30s burst debounce. Pattern is consistent
-enough to be a base rate, not coincidence.
-
-**Verdict:** WORKSPACE is no longer reliable as a "what to work on next"
-surface. Every "actionable TODOs" survey returns false positives. Brain
-migration on 2026-04-24 imported items but did not sweep status.
-
-**Scope:** Walk every `[ ]` bullet in WORKSPACE; per-item verify against
-current /opt/{copybot,newsbot,scoutbot}/ code, recent git log, service
-state. Mark `[x]` with verification note for shipped items; reframe or
-delete for stale calendar/cron items; leave `[ ]` only for genuinely
-pending work. Estimated ~30-45 min focused; produces a clean WORKSPACE
-that future "what's actionable" sessions can trust.
-
-**Bundles with:** NewsBot fuzzy-dedup state question (was Tier 2 item;
-turned out to be "investigate-then-decide" rather than implementation —
-same class as the audit itself, run alongside).
-
-**Prerequisite to:** any future Tier 1+2 sweep session. Without this,
-those sessions waste time verifying line-by-line.
-
-
----
-
-## INFRA-WORKSPACE-DRIFT-AUDIT — inventory 2026-04-28
-
-**Status:** Inventory complete. Verification deferred to fresh session.
-
-**Surface:** 44 open `[ ]` bullets, 17 done `[x]`, 1 `[!]` deviation marker.
-
-**Batch grouping (5-6 items each, 8 batches total):**
-
-CopyBot (24 items, 4 batches):
-- Batch A (baseline):    L14, L15, L20, L21, L22, L26
-- Batch B (infra):       L29, L30, L32, L33, L35, L36
-- Batch C (SCT + gate):  L37, L38, L39, L42, L43, L57
-- Batch D (Apr 27 work): L58, L59, L62, L63, L64, L65
-
-NewsBot + ScoutBot (4 items, 1 batch):
-- Batch E:               L75, L76, L83, L84
-
-Cross-cutting (16 items, 3 batches):
-- Batch F (Apr 24):      L89, L90, L91, L93, L94, L95
-- Batch G (older):       L96, L99, L102, L103, L104, L105
-- Batch H (SCT + scout): L110, L111, L115, L116
-
-**Already verified this session (don't re-verify):**
-- L29 INFRA-PROFILER-FIELD-FRESHNESS (pending, decision documented)
-- L62 PHASE3-LIVE (precondition closed by today's validation; stays open until TIER3 cycle)
-- L65 WORKSPACE-HEADER-DISCIPLINE (touched, not closed; CHAT_RULES edit still open)
-
-**Time-deferred — verify "still pending," not "done":**
-- L57 CB-FLIP-GATE-TIER3-ANALYSIS — scheduled 2026-05-25
-- L75 NewsBot May 7 gate — cohort-driven, awaiting settlement lag
-- L94 CB-DECAY-BUYHOLD-AUDIT — gated on next decay-monitor fire
-
-**Effort estimate:** ~3.5 hours focused (5 min/item x 44). Most should resolve
-faster; some will need git log dives. Walk batches sequentially with a STOP
-between each — fatigue degrades judgment-per-item work faster than mechanical
-work.
-
-**Methodology (from today's findings):** For each item, verify against
-(a) /opt/{bot}/ code grep, (b) recent git log, (c) service state if applicable.
-Mark `[x]` with verification note for shipped items. Reframe or delete for
-stale calendar/cron items. Leave `[ ]` only for genuinely pending work.
 

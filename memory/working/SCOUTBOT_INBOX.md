@@ -84,6 +84,27 @@
 | SCT-AUTO-1006 | CopyBot | Run `python3 harvester.py --add 0xdf17f4a8dd01a4cfa6fc3da323a2baee5f8697d1` to ingest full trade history for Clear-Co... | — | ACTIVE | — | 5.4 | 2026-04-27 |
 | SCT-AUTO-1007 | ALL | Audit all public-facing dashboards and API endpoints across the full bot suite — verify access is restricted to authe... | — | ACTIVE | — | 5.1 | 2026-04-27 |
 | SCT-AUTO-1008 | ALL | Review operational security posture for remote or mobile access scenarios — determine whether team members access liv... | — | ACTIVE | — | 5.1 | 2026-04-27 |
+| SCT-AUTO-1009 | CopyBot | Audit GUI trader-discovery UX patterns in 0xsebasneuron's implementation against CopyBot's activity API monitoring ap... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1010 | CopyBot | Review safe-by-default execution gates in 0xsebasneuron's implementation for edge cases not covered by CopyBot's RULE... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1011 | CopyBot | Compare 0xsebasneuron's arbitrage detection logic against CopyBot's price drift check and MON-30 flow spike model — d... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1012 | CopyBot | Extract the full wallet address from the tweet URL or linked on-chain source and run `python3 harvester.py --add <ful... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1013 | CopyBot | Evaluate whether CopyBot's MON-36 contradiction guard and RULE 22 logic can be inverted or extended to flag YES+NO co... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1014 | CopyBot | Cross-reference this wallet's active markets against MON-5 basket consensus signals to determine whether YES+NO mispr... | — | ACTIVE | — | 6.7 | 2026-04-28 |
+| SCT-AUTO-1015 | CopyBot | Resolve @durrrrrrrr to a full 0x wallet address via `polymarket.com/@durrrrrrrr` and run `python3 harvester.py --add ... | — | ACTIVE | — | 6.1 | 2026-04-28 |
+| SCT-AUTO-1016 | CopyBot | If on-chain validation passes, analyze trade timing and market-category distribution for options-derived behavioral p... | — | ACTIVE | — | 6.1 | 2026-04-28 |
+| SCT-AUTO-1017 | CopyBot | Run `python3 harvester.py --add 0xcc87cc69b76dd01063a66825b25d6c89f1fac830` to ingest full trade history for tteqkaq;... | — | ACTIVE | — | 6.1 | 2026-04-28 |
+| SCT-AUTO-1018 | CopyBot | Run `python3 harvester.py --add 0x4c353dd347c2e7d8bcdc5cd6ee569de7baf23e2f` to ingest full trade history for WangXing... | — | ACTIVE | — | 5.9 | 2026-04-28 |
+| SCT-AUTO-1019 | ALL | Extract and document the Kelly sizing formula and backtesting methodology from the repo; validate against KrajekBot's... | — | ACTIVE | — | 5.8 | 2026-04-28 |
+| SCT-AUTO-1020 | ALL | Review the vector search and OpenAI market insight synthesis pattern for news relevance ranking; assess whether the r... | — | ACTIVE | — | 5.8 | 2026-04-28 |
+| SCT-AUTO-1021 | ALL | Review PR #22043 in the v2.44.0 release to confirm no changes to oracle feed endpoints, update cadences, or relay-pat... | — | ACTIVE | — | 5.8 | 2026-04-28 |
+| SCT-AUTO-1022 | ALL | Audit v2.44.0 release notes for any Pyth or Chainlink API surface changes that could affect cross-oracle feed routing... | — | ACTIVE | — | 5.8 | 2026-04-28 |
+| SCT-AUTO-1023 | CopyBot | Run `python3 harvester.py --add 0x6f8b2886707673629af6bbf7314b8081021601aa` to ingest full trade history for sunflowa... | — | ACTIVE | — | 5.4 | 2026-04-28 |
+| SCT-AUTO-1024 | CopyBot | Run `python3 harvester.py --add 0xd3dff2e3b903372799b240c2338dd423086082fa` to ingest full trade history for 0xD3D; v... | — | ACTIVE | — | 5.4 | 2026-04-28 |
+| SCT-AUTO-1025 | CopyBot | Run `python3 harvester.py --add 0x002217232504477043ab14d6ca12d45b95085f11` to ingest full trade history for 0xaabec1... | — | ACTIVE | — | 5.4 | 2026-04-28 |
+| SCT-AUTO-1026 | CopyBot | Run `python3 harvester.py --add 0x0adedcb79423aed988a849827ff80b8cc7b3ed94` to ingest full trade history for 0Ebe; va... | — | ACTIVE | — | 5.3 | 2026-04-28 |
+| SCT-AUTO-1027 | CopyBot | Run `python3 harvester.py --add 0xe40172522c7c64afa2d052ddae6c92cd0f417b88` to ingest full trade history for BoomLaLa... | — | ACTIVE | — | 5.3 | 2026-04-28 |
+| SCT-AUTO-1028 | CopyBot | Run `python3 harvester.py --add 0xb7f55b6d32c2ee3768192d676cd66354f51fc669` to ingest full trade history for cassiusw... | — | ACTIVE | — | 5.1 | 2026-04-28 |
+| SCT-AUTO-1029 | ALL | Review flumine order lifecycle and position reconciliation patterns as architectural reference for CopyBot state mana... | — | ACTIVE | — | 5.0 | 2026-04-28 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
@@ -197,3 +218,29 @@ SCT-AUTO-931 SCT-AUTO-932 SCT-AUTO-933 SCT-AUTO-934
 ## Pending items
 
 (none yet — first ScoutBot run after 2026-04-24 cutover will append here)
+
+## 2026-04-28 — SCT-AUTO-1000 — drift triage: /opt/copybot working tree
+- 6 data/* files modified (operational state — likely benign, verify)
+- fix_watchlist.py deleted (tracked file removal, intent unconfirmed)
+- 30+ untracked: .bak.*, tier3 snapshots, audits/, backups/, monitors/, logs/
+- Surfaced during Phase 3 attribution commit 2026-04-28 ~05:55 UTC (74d4d8f in /opt/copybot)
+- Action: dedicated triage session — git diff data/, confirm fix_watchlist.py deletion intentional, decide on untracked dir fates
+- Priority: low (does not block Phase 3); medium if working tree drift accumulates further
+
+## 2026-04-28 — SCT-AUTO-1001 — session-template path bug: /opt/scoutbot/SCOUTBOT_INBOX.md does not exist
+- Every session block's Task 0 currently runs: `grep "$(date '+%Y-%m-%d')" /opt/scoutbot/SCOUTBOT_INBOX.md || echo "no SCT-AUTO items today"`
+- That path does not exist; the real inbox is at /root/.agent/memory/working/SCOUTBOT_INBOX.md
+- Likely moved during INFRA-RETIRE-CLEANUP 2026-04-24 (per WORKSPACE: "ScoutBot redirected to write into new SCOUTBOT_INBOX.md")
+- The `||` fallback swallows the missing-file error so the morning check has been silently no-op'ing
+- Surfaced 2026-04-28 06:07 UTC when a same-template Task 6 `cat >>` accidentally created /opt/scoutbot/SCOUTBOT_INBOX.md as a fresh file with SCT-AUTO-0001
+- Action: update session_start_paste.md and any chat-template snippets to point at /root/.agent/memory/working/SCOUTBOT_INBOX.md
+- Priority: medium (silent failure in routine check, masks legitimate inbox items)
+
+## 2026-04-28 — SCT-AUTO-1030 — bulk review marker: 2026-04-24 to 2026-04-28 backlog
+- 95 table-format items (Pass B) + 2 section-format items (Pass A) skimmed in dual-format pass on 2026-04-28 ~06:18 UTC
+  - Per-date table counts: 04-25=33, 04-26=19, 04-27=22, 04-28=21
+  - Section-format: my own SCT-AUTO-1000 (drift triage) and 1001 (template path bug)
+- Bulk-skim filters surfaced no operationally critical items — bulk is wallet-add research leads, repo-audit comparisons, and pattern-extraction tasks. CopyBot/ALL split visible in routing column.
+- Items NOT individually promoted: parked in place, considered reviewed; future sessions should treat 04-24 to 04-28 as already-triaged and only act on items dated 04-29 onwards.
+- Items requiring follow-up if reactivated: sort by score descending and pick from top.
+- Root cause of blind window: SCT-AUTO-1001 (broken Task 0 grep path); fixed 2026-04-28 via Standing pre-tasks section in /root/.agent/session_start_paste.md.

@@ -544,6 +544,8 @@ covers, which is rarely exactly what the audit intends.
 
 **File structure assumptions cost time when based on partial reads.** Tuesday morning ate two minutes diagnosing a phantom "yesterday's LESSONS entries didn't land" alarm because I'd assumed LESSONS was dates-first ordered and used `head -50` to grep for `## 2026-` headers. The actual file has a categorical reference section at top, with dated entries appearing later. Companion to the 2026-04-27 entry on brain path references: when about to edit a file, sample at multiple positions (`head` + `grep -n` + `tail`) rather than relying on the first N lines to represent overall structure. Same root cause: operating on partial knowledge of a file's organization.
 
+**Hardening blocks need MORE pre-run scrutiny than usual, not less.** Tuesday afternoon a pre-(b) cleanup block — whose entire purpose was to fix a silent-grep-failure (the `/opt/scoutbot/SCOUTBOT_INBOX.md` path bug from earlier the same day) — itself contained two fresh instances of the same bug class: (1) targeted `/root/docs/session_start_paste.md` when the authoritative path per CLAUDE.md is `/root/.agent/session_start_paste.md`, (2) used a single-format awk filter that would have silently missed 95 of 97 table-format items in the inbox, producing a false-clean bulk-review marker that would have licensed future sessions to skip re-scanning. Caught by pre-run review before execution. Pattern: confirmation bias is highest exactly when writing a fix — "I am defending against the silent-failure mode, therefore my defense is correct" — which obscures fresh instances of the same bug class living in the defense itself. Defense: every block whose purpose is to harden against a silent-failure mode must verify (a) every path it targets actually exists, (b) every filter format matches the actual data shape, (c) the abort/output path is loud rather than silent if its assumptions are wrong. The discipline is recursive: the meta-check is itself susceptible to the same bias, so the artifact under review should be inspected by an independent pass — different reader, different time, or both. **The lesson is the meta-pattern, not the specific path or filter.**
+
 ## 2026-04-27 — `git add -A` in non-brain repos masks unrelated index state
 
 Surfaced via 250c696 (Phase 3 morning session). The rule "per-file git add outside /root/.agent" is not enforceable when scripts use `-A`. Two fixes available: enumerate writers in script (preferred — explicit dependency on which files are touched), or pre-commit status check that aborts if more files staged than expected. evening.sh step 2/4 currently uses `git add -A` in /root/docs; INFRA-EVENING-SCOPE TODO captures the patch. Pattern generalizes: any automated script that commits to a shared repo needs explicit scoping, not blanket staging. **Session-level corollary (added same day after second occurrence):** index state can leak even when explicit `git add <file>` is used — if a prior `M` file was already staged, the new `add` joins the existing index. Two collateral commits in one session (250c696 in /root/docs, e604f6b in /root/.agent) both followed this pattern. The defense is `git status --short` immediately *before* the add to surface unexpected staged files, not after the commit. Rule applies regardless of repo (brain or otherwise) and regardless of whether `-A` or per-file `add` is used.
@@ -571,3 +573,98 @@ The 0xaa075924e1 case (Apr 27 Phase 3 magnifier audit) shows a wallet passing bo
 ## 2026-04-27 — When the brain explicitly references a file's path elsewhere, that path is data, not assumption fodder
 
 Apr 27 morning session: assumed evening.sh was in /root/ despite WORKSPACE explicitly listing morning.sh:56,62 and evening_updater.py:51,303 in the INFRA-SERVICE-RENAME TODO, all of which run from /root/docs/. Cost: one round-trip for path correction. Pattern: when reasoning about file locations, search the brain for prior path references before assuming — they're usually there.
+
+## 2026-04-28 — Phase 3 min-gating empirically validated on 44-wallet T2 cohort
+
+**Result:** End-to-end validation of CB_BUYHOLD_ATTR PRODUCER+CONSUMER on real
+production T2 wallets. 0/44 integrity violations across three independent
+dimensions (consumer flag liveness, PRODUCER coverage, routing correctness).
+
+**Quantitative signal:** 42/44 wallets (95.5%) path-A-fail under min(legacy,
+resolved) gating. Cohort was selected by Apr 27 audit using min_gating_pnl;
+44/44 expected the same outcome the live gate produced on 42, with 2 having
+shifted between Apr 27 snapshot and Apr 28 rescore. The cohort-selection
+methodology and the gate's actual behavior agree on 95.5% of wallets — strong
+validation that the audit logic itself is sound and reusable.
+
+**Qualitative signal:** Leg-delta distribution is the operationally important
+finding. Top swings: $276k, $170k, $132k on individual wallets. These are not
+"min-gating slightly tightens admission" magnitudes — they're "legacy
+net_pnl_pm was systematically wrong about expected risk by hundreds of
+thousands of dollars per wallet." Every wallet copy-traded under the legacy
+gate carried that gap as silent risk.
+
+**The 2 admits are positive findings, not failures:**
+- 0x1df5647487 (wr 0.874, n=2114): genuine outlier; conservative-side gating
+  correctly preserves it.
+- 0xd054e72b9e: resolved EXCEEDS legacy, so min() picks legacy — admits on the
+  conservative leg as designed.
+
+Reframing rule: do not let future analysis pressure invert these into "the 2
+we got wrong." They are "the 2 the gate correctly chose to keep."
+
+**Boundary condition reconfirmed:** 0xaa075924e1 was NOT in the cohort despite
+carrying $4.86M MTM exposure. Both pnl signals positive ($604k resolved / +$N
+legacy) means min-gating, the audit, and the cohort all blind to it by
+construction. This is the realized_ratio blindspot from earlier LESSONS, now
+empirically reconfirmed by absence rather than admission. The realized_ratio
+gate variant remains the right next investigation surface, but is a separate
+epistemic project.
+
+**Operational pre-commitment held:** No action on the 42 demote-eligible
+wallets until TIER3 cycle completes (~2026-05-12). The pre-commitment was made
+under uncertainty about gate correctness; the resolution of that uncertainty
+is what makes honoring the commitment cheap, not expensive.
+
+**Methodology lesson:** Pre-specifying the audit script BEFORE seeing the
+full-run data prevented ad-hoc storytelling on the output. The four checks
+(admission rate, spotlight wallets, routing correctness, drift) were
+formulated before any wallet beyond the dry-run was processed. Apply this
+pattern to future validation work: encode the questions as assertions, run
+them, read the verdict — don't fish.
+
+**Evidence artifact:**
+/opt/copybot/data/phase3/validation_run_20260428.jsonl (46 lines: header + 44
+records + footer; preserved from rotation-eligible logs/ source).
+
+
+
+## 2026-04-28 — TODO drift is measurable: 60% stale rate observed in Tier 1+2 sweep
+
+**Observation:** Tier 1+2 arc verified 5 WORKSPACE items against actual
+production state. 3/5 were already shipped or stale; only 2/5 were genuinely
+pending work. Stale items: WeatherBot section (bot retired Apr 22), SCAN-7
+cron line (service-managed, not actionable), NewsBot datetime.utcnow()
+deprecation (fixed Apr 13 in 30105d8), NewsBot 30s burst debounce (shipped
+60s in 60b450f).
+
+**Implication:** WORKSPACE-as-source-of-truth has decayed since the
+2026-04-24 brain migration. The migration imported items correctly but
+didn't sweep done-status. Every subsequent "what's actionable" survey
+inherits the staleness — including, ironically, the survey that produced
+this lesson.
+
+**Methodology that worked:** Recon-first on every TODO. The pattern
+emerged because each "Block N" started with verification rather than
+implementation. The first stale item (datetime.utcnow) could have been
+written off as one bad memory; the second (burst debounce) made the
+pattern visible; by the third we had base-rate evidence.
+
+**Lesson:** Treat any pre-2026-04-24 WORKSPACE item with the same
+skepticism applied to memory-derived facts: verify against /opt/{bot}/
+code or git log before treating it as actionable. The cost of verification
+is ~5 min per item; the cost of skipping it is starting work that's
+already done.
+
+**Spawned remediation:** INFRA-WORKSPACE-DRIFT-AUDIT (parked, dedicated
+session). Walking every `[ ]` and verifying once is the only durable fix;
+the alternative is paying the verification tax forever on every TODO sweep.
+
+**Connection to earlier 2026-04-28 LESSONS entries:** This is the third
+"hidden silent failure" surfaced today. First was the Task 0 grep
+no-op'ing for 4 days (~95 SCT-AUTO items). Second was the audit-script
+schema mismatch returning 0/3077 admission. Third is TODO drift. Common
+shape: a process that produces plausible output without doing what it
+claims. Defense in all three cases: don't trust positive-looking results
+from a workflow until at least one external check has validated the
+workflow itself.
