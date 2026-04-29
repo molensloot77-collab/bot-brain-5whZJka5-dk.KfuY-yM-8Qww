@@ -708,3 +708,43 @@ The "pattern to internalize" paragraph above predicted this. Within minutes of w
 **4. Hash-narration drift.** A draft of this amendment carried a SHA from an earlier prompt iteration as the prior watchlist commit reference; the actual landed SHA was `c7c395e`. Caught in pre-run review before any write. Different sub-class than the silent-skip-in-tooling instances above: an operation that *will* succeed (commit goes through) carrying reference data that *won't* resolve (`git show <wrong-hash>` → bad object). Same family because the failure is invisible at write-time and only surfaces when a reader tries to follow the reference. **Codify:** apply-scripts that construct commit messages or LESSONS entries with hash references must capture the live SHA at run-time (`$(git rev-parse --short HEAD)` from the relevant repo) rather than substitute a literal carried over from a draft. The script cannot know what the "right" hash is until the prior commit lands; narration written before that point is provisional.
 
 **Family signature.** Cohort-selection silent-skip, heredoc-quoting silent-skip, index-leak silent-skip, gitignore silent-skip, JSON-noise hiding semantic diff, hash-narration drift. **Six instances same day, five surfaces.** Each was an "operation appeared to succeed because the failure was silent" or "narration appeared correct because the cross-check did not run." General defense: every operation that produces a numeric or boolean confirmation needs a second check that what was confirmed is what was intended. Status checks observe; gates enforce. Live data beats narrated data. Use gates and live data.
+
+### 2026-04-29 — Correction: today's Phase 3 cohort-coverage findings were wrong on the core claim
+
+The two prior 2026-04-29 entries (commits 21dd437 and 4ff5de5) and the WORKSPACE TODO they generated (CB-PHASE3-NULL-LEGACY-BLINDSPOT in commit ef0dcd4) are factually wrong on their core finding. Recording the falsification here in full so future sessions don't operate on the wrong premise.
+
+**What was claimed.**
+- 179 of 286 T2/copy_enabled wallets were "silently skipped" from Phase 3 cohort selection because `min(legacy, resolved)` is undefined when `net_pnl_pm` is None.
+- Phase 3 validation scope was therefore 44/223 = 19.7%, not 44/44 = 100%.
+- Pre-commitment "no demote until ~May 12" was cohort-scoped and did not bind silently-skipped wallets.
+
+**What is actually true.**
+- `flip_gate_shadow.py` line 232: `legacy_pnl = profile.get("net_pnl_pm", 0) or 0`. The `or 0` defaults None to 0; `min(0, resolved)` is well-defined. No wallet is silently skipped on this basis.
+- More importantly, `profile` in that line is the **fresh `compute_profile()` output**, not the watchlist record. Phase 3 reads gate inputs from a freshly-computed profile per wallet at gate time. The watchlist record's `net_pnl_pm` field is not consulted.
+- Validation evidence: `validation_run_20260428.jsonl` shows wallet 0xf86c606c8a (which IS in the morning "null-legacy bucket") got `gate_pnl_legacy: 383.68` at gate time. Real positive number. The field was populated from fresh compute, despite the watchlist record having null.
+- Phase 3 cohort selection therefore evaluated the eligible cohort correctly. The 44/44 claim stands. Validation scope was not 19.7%.
+
+**What is still true (narrower bug).**
+- `update_watchlist()` in `rescore_watchlist.py:432-475` does not copy `net_pnl_pm` from `new_metrics` to the persisted record. The watchlist's `net_pnl_pm` field is universally null across all 286 records and has been for at least 15 days (verified across four backups Apr 15 / Apr 17 / Apr 24 / Apr 29).
+- This is real but narrow. The field is null on disk; no current consumer reads the disk value (gate logic does fresh compute). Impact is "watchlist record looks stale to humans inspecting the file" not "downstream logic is broken."
+- Whether the field SHOULD be persisted is a separate question — possibly worth fixing for inspection ergonomics, possibly a deliberate design choice (write-once at harvester-add). Investigation deferred.
+
+**0xbedbc3808d demote (commit c7c395e + df95e17) — action stands, rationale text was wrong.**
+- Wallet still bleeds: `profiler_resolved_pnl` = -$63,301 is real, Apr 28 #3 worst swing event is real, copy_enabled=False is the right state.
+- The rationale text ("silent-skip in cohort selection") is wrong. The wallet was eligible for Phase 3 cohort selection on the same terms as any other; it just wasn't flagged because it didn't meet the demote threshold under the cohort criteria as Phase 3 ran them.
+- Demote-decision audit jsonl gets a correction appended (separate commit on copybot repo).
+
+**Pattern to internalize: trace-the-consumer-not-just-the-producer.**
+- The morning's investigation traced backward from "watchlist field is null" to "rescore doesn't write it" and stopped. It never traced forward to ask "does any consumer actually read this null value?" — which would have surfaced the fresh-compute path and falsified the cohort-skip framing before any LESSONS commit.
+- Bugs in producer code don't matter if no consumer reads the produced field. Conversely, bugs hypothesized in consumer behavior require tracing the actual consumer code, not assuming that the producer's output shape determines the consumer's behavior.
+- General defense: any claim about data-flow, cohort selection, or gate logic requires an end-to-end trace (input → producer → storage → consumer → output) before it goes into LESSONS. Partial trace + plausible synthesis is exactly the failure mode here.
+
+**Family signature update.**
+- This is the second major falsification of the day's work-in-progress claims (after the morning's silent-skip-in-tooling family). Different family — that was "tooling silently failed"; this is "narrated reasoning was wrong."
+- Both share a meta-defense: the work needs to test against itself, not just against its own internal consistency. Today the test against actual code (flip_gate_shadow.py:232) falsified ~5h of synthesis.
+- Worth naming the family: **"stacked-inference falsification"** — confident claim built on partial trace, subsequent reasoning treats it as fact, downstream artifacts compound. Defense: end-to-end trace before commit; mark work-in-progress claims as provisional in LESSONS rather than as findings.
+
+**Brain state action.**
+- This entry does NOT delete or rewrite the prior two 2026-04-29 entries. Those remain in git history with their wrong claims; this entry references them and falsifies them. Future readers see the full sequence.
+- The CB-PHASE3-NULL-LEGACY-BLINDSPOT TODO body is rewritten in WORKSPACE (separate commit) to reflect the actual narrow bug.
+- L20 (CB-MARTINGALE-WATCH-0x8a81855d) is amended: the gating reference to CB-PHASE3-NULL-LEGACY-BLINDSPOT was on the wrong premise; the wallet's demote/threshold decision is on its own merits, not gated on null-legacy resolution.
