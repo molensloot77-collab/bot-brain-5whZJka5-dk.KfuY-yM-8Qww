@@ -105,6 +105,35 @@
 | SCT-AUTO-1027 | CopyBot | Run `python3 harvester.py --add 0xe40172522c7c64afa2d052ddae6c92cd0f417b88` to ingest full trade history for BoomLaLa... | — | ACTIVE | — | 5.3 | 2026-04-28 |
 | SCT-AUTO-1028 | CopyBot | Run `python3 harvester.py --add 0xb7f55b6d32c2ee3768192d676cd66354f51fc669` to ingest full trade history for cassiusw... | — | ACTIVE | — | 5.1 | 2026-04-28 |
 | SCT-AUTO-1029 | ALL | Review flumine order lifecycle and position reconciliation patterns as architectural reference for CopyBot state mana... | — | ACTIVE | — | 5.0 | 2026-04-28 |
+| SCT-AUTO-1031 | CopyBot | Run `python3 harvester.py --add 0xe613b515bd46b1585a8b137a4d291d9b80bd540e` to ingest full trade history for Gucky-Gu... | — | ACTIVE | — | 7.7 | 2026-04-29 |
+| SCT-AUTO-1032 | CopyBot | Run `python3 harvester.py --add 0xfa21179f2cef2f61cb78e8340ae62b17f9271438` to ingest full trade history for BABELCON... | — | ACTIVE | — | 7.7 | 2026-04-29 |
+| SCT-AUTO-1033 | CopyBot | Run `python3 harvester.py --add 0x68146921df11eab44296dc4e58025ca84741a9e7` to ingest trade history for LynxTitan; va... | — | ACTIVE | — | 7.4 | 2026-04-29 |
+| SCT-AUTO-1034 | CopyBot | Run `python3 harvester.py --add 0x76b8007b407fa14c650138b25fb25e22ac149a33` to ingest trade history for hayes99; vali... | — | ACTIVE | — | 6.9 | 2026-04-29 |
+| SCT-AUTO-1035 | CopyBot | Run `python3 harvester.py --add 0x5bb0de4e97698184ead80c80cb17a26cd6f6814b` to ingest full trade history for bobe2.1;... | — | ACTIVE | — | 6.9 | 2026-04-29 |
+| SCT-AUTO-1036 | CopyBot | Run `python3 harvester.py --add 0x0e1b30c63f6bac4fa1eacc7b852fa7e72e93ecaf` to ingest full trade history for sjhfccha... | — | ACTIVE | — | 6.9 | 2026-04-29 |
+| SCT-AUTO-1037 | CopyBot | Run `python3 harvester.py --add 0xed107a85a4585a381e48c7f7ca4144909e7dd2e5` to ingest full trade history for bobe2; v... | — | ACTIVE | — | 6.9 | 2026-04-29 |
+| SCT-AUTO-1038 | ALL | Document Predict Raven state machine for crash recovery and reconnection logic; map patterns against CopyBot and Kraj... | — | ACTIVE | — | 6.8 | 2026-04-29 |
+| SCT-AUTO-1039 | ALL | Extract market selection heuristics from Predict Raven codebase if available; cross-reference against ScoutBot's curr... | — | ACTIVE | — | 6.8 | 2026-04-29 |
+| SCT-AUTO-1040 | ALL | Monitor Predict Raven's live P&L trajectory on an ongoing basis; flag if sustained directional edge emerges as signal... | — | ACTIVE | — | 6.8 | 2026-04-29 |
+| SCT-AUTO-1041 | CopyBot | Run `python3 harvester.py --add 0x96489abcb9f583d6835c8ef95ffc923d05a86825` to ingest full trade history for anoin123... | — | ACTIVE | — | 6.8 | 2026-04-29 |
+| SCT-AUTO-1042 | CopyBot | Run `python3 harvester.py --add 0xdaad6f960d507dba148c1ff908db5a28743169cc` to ingest full trade history for junkbond... | — | ACTIVE | — | 6.4 | 2026-04-29 |
+| SCT-AUTO-1043 | ALL | Review poly-web3 API surface for gas-free split/merge operations; assess compatibility with the suite's existing CLOB... | — | ACTIVE | — | 6.3 | 2026-04-29 |
+| SCT-AUTO-1044 | ALL | Test Safe wallet redemption flow against the suite's current wallet infrastructure; confirm whether gas-free redempti... | — | ACTIVE | — | 6.3 | 2026-04-29 |
+| SCT-AUTO-1045 | CopyBot | Run `python3 harvester.py --add 0x4f77be59e16ea2734b1e2118379d02ac321d47f4` to ingest full trade history; validate $5... | — | ACTIVE | — | 6.3 | 2026-04-29 |
+| SCT-AUTO-1046 | ALL | Review PolyArb API specification for Solana wallet integration compatibility with the BTC Up/Down module; confirm whe... | — | ACTIVE | — | 6.2 | 2026-04-29 |
+| SCT-AUTO-1047 | ALL | Benchmark module oracle feed latency and resolution against PolyArb's current Chainlink 5-minute BTC feed; flag any l... | — | ACTIVE | — | 6.2 | 2026-04-29 |
+| SCT-AUTO-1048 | CopyBot | Run `python3 harvester.py --add 0xd809c54478c5e50fe2aa20acccf0857baa0a6542` to ingest full trade history; validate $6... | — | ACTIVE | — | 6.1 | 2026-04-29 |
+| SCT-AUTO-1049 | ALL | Audit PolyClaw's hedge discovery algorithm and LLM prompt engineering for novel position-correlation heuristics; asse... | — | ACTIVE | — | 6.0 | 2026-04-29 |
+| SCT-AUTO-1050 | ALL | Evaluate whether the OpenClaw framework's CLOB execution path introduces latency overhead relative to the suite's exi... | — | ACTIVE | — | 6.0 | 2026-04-29 |
+| SCT-AUTO-1051 | CopyBot | Run `python3 harvester.py --add 0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1` to ingest full trade history; validate $6... | — | ACTIVE | — | 5.9 | 2026-04-29 |
+| SCT-AUTO-1052 | ALL | Audit the linked GitHub repository for novel analytics, orchestration patterns, or py_clob_client-compatible utilitie... | — | ACTIVE | — | 5.7 | 2026-04-29 |
+| SCT-AUTO-1053 | ALL | Cross-reference the 108 tools against PolyClaw (SCT-AUTO-1049/1050) and the BTC Up/Down module (SCT-AUTO-1046/1047) a... | — | ACTIVE | — | 5.7 | 2026-04-29 |
+| SCT-AUTO-1054 | ALL | Evaluate @poly_parlay basket construction for higher-order position correlation signals; assess whether parlay EV sys... | — | ACTIVE | — | 5.7 | 2026-04-29 |
+| SCT-AUTO-1055 | ALL | Cross-validate the claimed 40% bot-volume figure against on-chain trade frequency, wallet clustering, and inter-trade... | — | ACTIVE | — | 5.2 | 2026-04-29 |
+| SCT-AUTO-1056 | ALL | Monitor CLOB order book latency spreads for systematic algorithmic flow patterns; if adversarial bot volume is confir... | — | ACTIVE | — | 5.2 | 2026-04-29 |
+| SCT-AUTO-1057 | ALL | Flag @bored2boar as a low-signal marketing account in ScoutBot's source-quality registry; deprioritize future tweets ... | — | ACTIVE | — | 5.1 | 2026-04-29 |
+| SCT-AUTO-1058 | ALL | Audit ANPS-TradeMeUp entity extraction and impact-scoring pipeline for compatibility with ScoutBot's signal ingestion... | — | ACTIVE | — | 5.0 | 2026-04-29 |
+| SCT-AUTO-1059 | ALL | Evaluate the multi-agent consensus pattern for applicability to KrajekBot confirmation logic or PolyArb news-driven t... | — | ACTIVE | — | 5.0 | 2026-04-29 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
