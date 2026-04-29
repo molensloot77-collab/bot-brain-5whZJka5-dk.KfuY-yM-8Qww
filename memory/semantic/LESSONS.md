@@ -668,3 +668,29 @@ shape: a process that produces plausible output without doing what it
 claims. Defense in all three cases: don't trust positive-looking results
 from a workflow until at least one external check has validated the
 workflow itself.
+
+## 2026-04-29 — Phase 3 cohort-coverage gap: validation scope ≠ eligible cohort
+
+**Class:** silent-skip in cohort selection produces validation-scope ≠ validation-claim. Same pattern as 2026-04-28 hardening-block confirmation bias finding (output looks clean, claim's reach is narrower than implied).
+
+**Finding.** Phase 3 cohort selection uses `min(legacy, resolved) ≤ 0` to flag demote-eligible wallets. When `net_pnl_pm` (legacy) is None, `min()` is undefined and the wallet is silently skipped — not flagged, not demoted, not analyzed, not logged. Blast-radius probe 2026-04-29 (predicate: `net_pnl_pm IS NULL AND copy_enabled=True AND tier=='T2'`) returned **179 of 286 T2/copy_enabled wallets** (62.6%).
+
+**What is NOT falsified.** The 2026-04-28 entry's "0/44 integrity violations across three independent dimensions" claim holds for the 44 wallets evaluated. The CB_BUYHOLD_ATTR PRODUCER+CONSUMER pipeline is correct on the cases it sees. Gate logic is correct.
+
+**What IS falsified.** The implicit assumption that "44 wallets evaluated" = "eligible cohort." Actual eligible-cohort = 44 evaluated + 179 silent-skipped = 223. Validation scope was **44/223 = 19.7%**, not 44/44 = 100%. The pre-commitment "no demote action until ~May 12" was made on the cohort Phase 3 saw; it does not bind decisions on wallets the selection logic silently excluded — extending it would lock in continued copy of confirmed-bleeding wallets under a rule that was about not over-acting on cohort findings, not under-acting on findings outside the cohort.
+
+**Five wallets surfaced with negative resolved P&L in the null-legacy bucket.** All copy_enabled=True at finding-time:
+
+- 0xbedbc3808d... (-$63,301 resolved; was Apr 28 #3 worst swing +$10.5k → -$121k; profiler-freshness drift to -$63k a separate INFRA-PROFILER-FIELD-FRESHNESS surface)
+- 0xb3b50ef66acf4be... (-$16,003 resolved)
+- 0xba0d049aa323... (-$9,000 resolved)
+- 0xf86c606c8a36... (-$1,148 resolved)
+- 0xa6de582c9853... (-$1,117 resolved)
+
+**Action this session.** copy_enabled=False on 0xbedbc3808d... (smoking-gun event from independent surface). Other four left for proper analysis under CB-PHASE3-NULL-LEGACY-BLINDSPOT. Service restarted to pick up watchlist change.
+
+**Pattern to internalize.** Hardening / validation passes that produce numeric claims (X% pass rate, N/M coverage) need explicit denominator audit before the claim is considered tight. "0/44 integrity violations" answers "are the 44 we saw broken." It does not answer "are the 44 we saw the right 44." Two different questions; second is rarely asked because the first looks complete.
+
+**Postscript (same session).** This pattern recurred on the apply-prompt itself: heredoc-quoting bug ($ literals from a quoted heredoc) caught by pre-run scrutiny before any write. Two instances same day, different surfaces. The discipline is general, not Phase-3-specific.
+
+**Cross-references.** Pairs with 2026-04-27 (falsification-supersession on `min(legacy, resolved)` shared-blindspot in 0xaa075924e1) and 2026-04-28 (hardening-block confirmation bias). All three are silent-failure surfaces from the same review cycle.
