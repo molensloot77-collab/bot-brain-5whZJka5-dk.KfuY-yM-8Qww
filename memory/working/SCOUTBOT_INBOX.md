@@ -134,6 +134,20 @@
 | SCT-AUTO-1057 | ALL | Flag @bored2boar as a low-signal marketing account in ScoutBot's source-quality registry; deprioritize future tweets ... | — | ACTIVE | — | 5.1 | 2026-04-29 |
 | SCT-AUTO-1058 | ALL | Audit ANPS-TradeMeUp entity extraction and impact-scoring pipeline for compatibility with ScoutBot's signal ingestion... | — | ACTIVE | — | 5.0 | 2026-04-29 |
 | SCT-AUTO-1059 | ALL | Evaluate the multi-agent consensus pattern for applicability to KrajekBot confirmation logic or PolyArb news-driven t... | — | ACTIVE | — | 5.0 | 2026-04-29 |
+| SCT-AUTO-1060 | ALL | Evaluate Envio HyperIndex integration as a replacement or supplement to existing RPC-based market state queries; benc... | — | ACTIVE | — | 7.5 | 2026-04-30 |
+| SCT-AUTO-1061 | ALL | Audit indexed CTFExchange V2 contract ABIs for settlement, liquidity pool, and order fields not currently ingested by... | — | ACTIVE | — | 7.5 | 2026-04-30 |
+| SCT-AUTO-1062 | ALL | Assess indexer uptime and reorg-handling behavior on Polygon; if the indexer exhibits chain-reorg lag or downtime pat... | — | ACTIVE | — | 7.5 | 2026-04-30 |
+| SCT-AUTO-1063 | ALL | Cross-reference the full directory against current suite API and data-feed dependencies; flag any tools not already c... | — | ACTIVE | — | 7.3 | 2026-04-30 |
+| SCT-AUTO-1064 | ALL | Audit the directory's copy-trading and alert-systems sections for wallet discovery or anomaly-detection methods not c... | — | ACTIVE | — | 7.3 | 2026-04-30 |
+| SCT-AUTO-1065 | ALL | Identify the 3–5 highest-signal analytics or API tools in the directory not currently integrated into the suite; for ... | — | ACTIVE | — | 7.3 | 2026-04-30 |
+| SCT-AUTO-1066 | CopyBot | Add us391 (0x3f3aa7005f8006bfcc367d43a25cde25509fe8fd) to the harvester pipeline and pull full trade history; analyze... | — | ACTIVE | — | 6.9 | 2026-04-30 |
+| SCT-AUTO-1067 | CopyBot | Evaluate whether us391's low-volume, high-ROI profile warrants a separate CopyBot tracking tier for efficiency-optimi... | — | ACTIVE | — | 6.9 | 2026-04-30 |
+| SCT-AUTO-1068 | CopyBot | Add melon64 (0x13337ad24df8614481895cd33d4e9d70ac50e463) to the harvester pipeline and pull full trade history; analy... | — | ACTIVE | — | 6.3 | 2026-04-30 |
+| SCT-AUTO-1069 | ALL | Audit the V2 WebSocket integration for real-time spread detection patterns not currently implemented in PolyArb; cros... | — | ACTIVE | — | 5.5 | 2026-04-30 |
+| SCT-AUTO-1070 | ALL | Review gas optimization heuristics (batch execution, order routing logic) for applicability to PolyArb's execution la... | — | ACTIVE | — | 5.5 | 2026-04-30 |
+| SCT-AUTO-1071 | CopyBot | Add 11122 (0x011f2d377e56119fb09196dffb0948ae55711122) to the harvester pipeline at low priority; pull trade history ... | — | ACTIVE | — | 5.4 | 2026-04-30 |
+| SCT-AUTO-1072 | CopyBot | Audit Struct API field coverage (PnL granularity, position history depth, activity timestamps) against the current `p... | — | ACTIVE | — | 5.2 | 2026-04-30 |
+| SCT-AUTO-1073 | CopyBot | Add AV23IUa (0xdb859a551fcf56e49416160911476bea7307152f) to the harvester pipeline at low priority; use the 11.2% ROI... | — | ACTIVE | — | 5.2 | 2026-04-30 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
