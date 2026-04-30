@@ -410,3 +410,74 @@ The architectural section (kill-switch lines around 96, 101) was fixed in commit
 
 **Out of scope for this TODO:** Handover doc-drift is queued separately for evening routine per project rules.
 
+
+---
+
+### CB-V2-MIGRATION-FINDING — SDK spender-list change invalidated capital readers (added 2026-04-30 evening)
+
+**Status:** finding committed, action deferred.
+**Priority:** HIGH (gates any future live-flip), but no action tonight.
+**Owner action required:** none until live-flip is on the agenda.
+
+#### Headline
+
+The Apr 28 11:30:17 UTC bankroll-floor trip was NOT caused by wallet drain. The wallet has been static at ~$66.78 (USDC.e $64.50 + USDC native $2.28 + MATIC) since 2026-04-25 01:17 UTC redemption. The trip was caused by `py_clob_client`'s `get_balance_allowance(COLLATERAL)` returning 0 because the SDK started querying allowances against three contract addresses that have zero allowance set on this wallet.
+
+#### What actually changed at 11:30 UTC
+
+The SDK's `get_balance_allowance` queries allowance for the COLLATERAL token (USDC.e) against a list of spenders. As of 11:30 UTC the SDK queries:
+
+- `0xE111180000d2663C0091e4f400237545B87B996B` — genuinely new V2 contract, allowance: 0
+- `0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296` — NegRisk Adapter (NOT new — present in codebase since redeemer.py:36 Apr 14), allowance: 0
+- `0xe2222d279d744050d28e00520010520000310F59` — genuinely new V2 contract, allowance: 0
+
+The bot's V1 allowances are intact (~$1M each on the original CTF Exchange `0x4bFb41d5...` and original NegRisk Exchange `0xC5d563A3...`), but the SDK no longer surfaces V1 allowance via `get_balance_allowance` — it surfaces only the union of new V2 spenders + Adapter, all of which are zero.
+
+#### What this re-frames
+
+The CB-PAPER-DECOUPLE-FLOOR architectural conclusion (decouple paper-mode from live-wallet readiness) **stands and is more obviously correct** than first argued — coupling paper evaluation to a reader brittle to upstream SDK changes is even worse than coupling to real drain. But the LESSONS-2026-04-30 entry's stated premise ("the wallet had drained to $3.94") is wrong. **LESSONS correction commit needed in next session.** Same correction-pass pattern as 2026-04-29.
+
+#### Blast radius (read-only recon, 2026-04-30 evening)
+
+**HOT** — currently returning 0:
+- `capital_check.py:40` (`client.get_balance_allowance(COLLATERAL)`)
+- `_fetch_total_recoverable()` at `activity_monitor.py:1442` — feeds bankroll floor + daily-tier limit (paper-mode bypassed via CB-PAPER-DECOUPLE-FLOOR; live-mode would hard-fail)
+- `balance_forensics.py:31` — same SDK call; morning reconciliation tool reads $0
+- `clob_executor.py:237` — same call inside `LiveExecutor.get_balance()`. Currently bypassed (paper-mode); future live-flip would hard-fail collateral check despite $64.50 in wallet
+
+**WARM** — uses V1/Adapter, NOT V2 (no zero-return symptom but assumptions encoded):
+- `redeemer.py:36` — hard-codes Adapter `0xd91E80cF...`. Settlement still works ("No redeemable positions found" is correct given current open book)
+- `clob_executor.py:151-152` — `create_order`/`post_order`. SDK may not auto-route V2 markets correctly. Live-flip precondition.
+- `wallet_scanner.py:64-66`, `patch_scanner.py:27-29`, `on_chain_scorer.py:42-44` — scanners look at V1 + Adapter outflows only. New wallet activity routed through V2 spenders is invisible to scanners. Forward-looking gap.
+
+**COLD** — Gamma/data-api path, contract-layer agnostic, **unaffected**:
+- `wallet_profiler_full.py` (data-api activity)
+- `harvester.py` (Gamma)
+- `rescore_watchlist.py` (data-api)
+- `flip_gate_shadow.py` (Gamma)
+
+Implication: **wallet-profiler reads are trustworthy.** L20 and other wallet decisions can proceed on existing data.
+
+#### Action plan (not executed)
+
+If/when CB-PAPER-PERFORMANCE-EVAL passes and triggers a live-flip session, the precondition action is three (or six) `approve(spender, MAX_UINT256)` transactions from the EOA against USDC.e (and possibly AssetType.CONDITIONAL for the CTF tokens):
+USDC.e.approve(0xE111180000d2663C0091e4f400237545B87B996B, MAX_UINT256)
+USDC.e.approve(0xd91E80cF2E7be2e162c6513ceD06f1dD0dA35296, MAX_UINT256)
+USDC.e.approve(0xe2222d279d744050d28e00520010520000310F59, MAX_UINT256)
+
+Each ~$0.01-0.05 MATIC gas. **Four-decisions-class action** — real-money on-chain transactions signed with the bot's private key, BigW human-only step. **Deferred to live-flip-trigger session, not part of paper-mode operation.**
+
+Optional (B-class) durable fix if patch-rather-than-reapprove preferred: patch `_fetch_total_recoverable()` (and `balance_forensics.py:31`, and `LiveExecutor.get_balance()`) to read EOA wallet USDC.e directly via Etherscan V2 instead of routing through SDK's `get_balance_allowance`. Removes upstream-SDK-change brittleness. Code-only, no on-chain transactions. Could land before live-flip as defense-in-depth.
+
+#### Existing tracking
+
+WORKSPACE already had this queued at line ~105: "Polymarket exchange migration monitoring (@PolymarketDevs) — CTF allowance re-approval needed post-migration on all bot wallets." This finding is the concrete realization of that TODO. **Treat the prior entry as superseded by this one** — do not act on the prior entry independently.
+
+#### Side-finding (separate, not part of this entry's scope)
+
+`[WARN] [SX CHECK] failed: Invalid format specifier '.3f if sx_price else 'N/A''` — Python f-string syntax error in SX comparator. 27 fires in 4 hours post-restart. Code bug, not migration-related. One-line fix on next CopyBot touch.
+
+#### LESSONS family note
+
+This is the third instance in 36 hours of "incomplete trace of the dependency graph" failure — same family as 2026-04-29 "trace the consumer not just the producer" and 2026-04-30 "live-system-race state-edit." This one: traced the bug *within* the bot's code; the actual cause was upstream of the bot, in the SDK's spender-list behavior. The trace stopped at the codebase boundary. General principle: **dependency tracing must follow the call chain across project boundaries, not stop at "code I own."** Worth a LESSONS entry of its own in the next session, not folded into the CB-PAPER-HALT correction.
+
