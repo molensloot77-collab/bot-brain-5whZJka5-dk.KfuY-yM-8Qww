@@ -333,3 +333,57 @@ work.
 Mark `[x]` with verification note for shipped items. Reframe or delete for
 stale calendar/cron items. Leave `[ ]` only for genuinely pending work.
 
+
+---
+
+### CB-PAPER-PERFORMANCE-EVAL — pre-committed criteria (added 2026-04-30)
+
+**Status:** queued. Earliest run: 2026-05-07.
+**Priority:** MEDIUM. Eval is the gate for any future paper→live conversation.
+**Owner action required:** none until eval session.
+
+**Why pre-commit:** defining "success" after seeing the data is post-hoc reasoning (LESSONS-2026-04-29 stacked-inference family). Criteria are committed below before any number is looked at.
+
+#### Eval window
+
+- **Closed window:** 2026-04-17 → 2026-04-28 11:30:17 UTC (~11d 17h, halt-bounded). **Primary dataset.**
+- **Open window:** 2026-04-30 06:11:51 UTC → ongoing (post-CB-PAPER-DECOUPLE-FLOOR restart). **Secondary check.**
+- Treated as **separate samples, not concatenated.** Regime changes between them (Phase 3 min-gating live since 04-27, decoupling itself) make concatenation silently lie.
+
+#### Sample-size floors (per Q3 lock 2026-04-30)
+
+- **WR / expectancy:** settled-only. **Floor: n ≥ 100** in closed window. Below floor → INCONCLUSIVE, primary criteria do not run.
+- **Drawdown / exposure:** full population (open + settled, opens marked at last observed mid). No floor.
+
+#### PASS thresholds (live-flip candidacy)
+
+All must hold on the closed window:
+
+- **WR ≥ 52%** on settled-only, n ≥ 100.
+- **Expectancy ≥ +$0.10 per bet**, gross of fees (CLOB taker = $0 per project memory).
+- **Max drawdown ≤ 30% of cumulative gross profit** on the closed window's P&L curve.
+- **Open-window check:** no statistically significant degradation vs closed window (closed-window WR 95% CI overlaps open-window point estimate). If open-window n is too thin to compute CI, this check is waived with explicit note.
+
+#### FAIL thresholds (extend or kill decision)
+
+Any of:
+
+- **Expectancy ≤ −$0.05 per bet** on settled-only, n ≥ 100.
+- **Max drawdown > 80% of cumulative gross profit.**
+- **WR ≤ 42%** on settled-only, n ≥ 100.
+
+#### INCONCLUSIVE (extend with timeline)
+
+Anything else, including: 42% < WR < 52%, expectancy in (−$0.05, +$0.10), n < 100 in closed window, all PASS criteria meet but open-window degraded, drawdown in (30%, 80%). Default extension: 14 days, re-run at eval+N.
+
+#### Out of scope
+
+- Per-wallet performance (handled by Phase 3 cadence, not strategy-level eval).
+- Sizing-logic evaluation (the $1.10 vs $10-paper-flat surprise is its own investigation).
+- Live taker-fee modeling (paper = gross; fees become relevant only on PASS → live-flip session).
+- Comparison to pre-Apr-17 baseline (no clean baseline exists).
+
+#### Execution
+
+Separate session, ~30-60 min. Reads `/opt/copybot/data/sports_signals.jsonl`, computes metrics, applies thresholds, produces verdict + WORKSPACE update. Earliest date 2026-05-07 to give open-window ≥7 days.
+
