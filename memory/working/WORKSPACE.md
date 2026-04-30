@@ -387,3 +387,26 @@ Anything else, including: 42% < WR < 52%, expectancy in (−$0.05, +$0.10), n < 
 
 Separate session, ~30-60 min. Reads `/opt/copybot/data/sports_signals.jsonl`, computes metrics, applies thresholds, produces verdict + WORKSPACE update. Earliest date 2026-05-07 to give open-window ≥7 days.
 
+
+---
+
+### CB-AGENT-MD-CURRENT-PHASE-REWRITE — narrative-doc drift (added 2026-04-30)
+
+**Status:** queued. Bounded ~15-20 min. Future session.
+**Priority:** LOW.
+**Owner action required:** none until session.
+
+**Why:** AGENT.md `## Current Phase` section (lines 95, 102-105, 108) carries the pre-Apr-22-falsification mental model:
+
+- "Paper Trading — Day 15. 996 wallets in activity_monitor v9. Paper P&L: +$13.56 (45 settled, 36W/9L, 80.0% WR)" — Day 15 was ~Apr 4; current is Day ~41. Wallet count and P&L numbers are ~3 weeks stale.
+- "Live gate: 50 settled trades (5 remaining, eligible ~Apr 5-6). … Pending: fund USDC, test --live --once, switch systemd to --live" — never happened. Paper-mode is now the operational target per CB-PAPER-DECOUPLE-FLOOR (2026-04-30).
+- "copybot-sports: activity_monitor.py v9 — 996 wallets, PAPER, kill switch -$50" — same staleness as line 95.
+
+The architectural section (kill-switch lines around 96, 101) was fixed in commit 3e80e51 this session. The `## Current Phase` rewrite is a separate scope — it's narrative status, not architecture.
+
+**Failure mode it prevents:** documentation contradicts code. AGENT.md still framing paper-mode as a precursor to live is the framing CB-PAPER-DECOUPLE-FLOOR structurally rejected. Mid-term risk: someone (including future-self) reads AGENT.md and acts on the stale framing.
+
+**Scope:** rewrite `## Current Phase` to reflect: (a) actual day count from Apr 17 paper start, (b) current 178 copy_enabled / 286 watchlist, (c) paper-mode is the operational target per the new decoupling, (d) no live-gate roadmap (live-flip is now an open question dependent on CB-PAPER-PERFORMANCE-EVAL outcome). Also fold in the cosmetic double-period at line 101 (`pre-live evaluation..` → `pre-live evaluation.`).
+
+**Out of scope for this TODO:** Handover doc-drift is queued separately for evening routine per project rules.
+
