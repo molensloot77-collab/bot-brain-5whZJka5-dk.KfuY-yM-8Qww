@@ -748,3 +748,67 @@ The two prior 2026-04-29 entries (commits 21dd437 and 4ff5de5) and the WORKSPACE
 - This entry does NOT delete or rewrite the prior two 2026-04-29 entries. Those remain in git history with their wrong claims; this entry references them and falsifies them. Future readers see the full sequence.
 - The CB-PHASE3-NULL-LEGACY-BLINDSPOT TODO body is rewritten in WORKSPACE (separate commit) to reflect the actual narrow bug.
 - L20 (CB-MARTINGALE-WATCH-0x8a81855d) is amended: the gating reference to CB-PHASE3-NULL-LEGACY-BLINDSPOT was on the wrong premise; the wallet's demote/threshold decision is on its own merits, not gated on null-legacy resolution.
+
+## 2026-04-30 — CB-PAPER-HALT: paper-killswitch coupled to live wallet, plus the live-system-race that predicted itself
+
+### Headline
+
+Paper signal generation halted 2026-04-28 11:30:17 UTC on a $40 bankroll-floor trip. Floor reads live on-chain wallet, not paper PnL. The wallet had drained to $3.94. No-one noticed for 41 hours including a service restart, because the alert path (`daily_summary_tg.py` cron) had been broken since the file was introduced 19 days earlier. Decoupled via `PAPER_REQUIRE_LIVE_BANKROLL` config flag (default true, flipped false on this server). Five commits, two self-inflicted CRITICAL alerts during the fix.
+
+### Three findings
+
+**1. Paper-mode killswitch coupled to live wallet (architecture).**
+The Apr 14 ce348f0 commit introduced a $40 bankroll floor that gates ALL signal generation, including paper. The original rationale was operationally correct on its own terms: "if the wallet can't go live, paper PnL doesn't translate." But it encoded a hidden dependency: paper-mode evaluation depends on live-wallet state, which is orthogonal to the strategy under test. When paper-mode became the operational target rather than a pre-live evaluation predicate, the coupling became a silent failure surface — and silently failed, for 41 hours.
+
+Defense (landed): `PAPER_REQUIRE_LIVE_BANKROLL` config flag in copy_config.json, default true (preserves Apr 14 design), set false on servers where paper-mode is the operational target. Persisted bankroll_floor_hit flag is preserved on disk as historical record; future live-mode flip will honor it as originally designed.
+
+**2. Live-system-race when state-edit competes with running writer.**
+Hit twice in this session. After landing the decoupling code, the apply-script ALSO cleared `bankroll_floor_hit` from `daily_state.json` — but the still-running old-code service polled 5 seconds after the clear, re-fetched the on-chain wallet, re-tripped the floor, re-wrote the state file, and fired a fresh CRITICAL TG alert. The next commit captured the re-tripped state with a message claiming to clear it. Reverted via new commit (project rule: revert, don't amend). The revert itself raced the running service the same way and triggered a third CRITICAL alert.
+
+The functional impact was zero in both cases — the gate stanza tolerates whatever state is on disk because it bypasses the read entirely. Which is exactly the point: when the new code makes a state-edit obsolete, do not also do the state-edit. Pick one strategy: stop the writer and edit, OR rely on the new code to tolerate the existing state. Doing both yields overhead, side-effects (user-visible TG pings), and misleading commit messages.
+
+**3. Lesson predicted itself, then predicted itself again.**
+The post-revert message explicitly named the live-system-race lesson AS A CANDIDATE for LESSONS-2026-04-30. The lesson then fired immediately on the revert itself — second instance within minutes of being named. Worth flagging as a distinct meta-pattern: naming a lesson is not the same as internalizing it. The gap between "I have written this down" and "I have changed how I act" is real and short — minutes, not days.
+
+### Family this sits in
+
+This is the same shape as LESSONS-2026-04-29 "trace the consumer not just the producer", flipped temporally:
+
+- 2026-04-29: traced backward from null-on-disk and stopped at the producer, missing that no consumer read the value. Failure was incomplete trace of the data-flow graph going backward from output.
+- 2026-04-30: edited a value on disk and stopped at the edit, missing that a concurrent live writer would overwrite it. Failure was incomplete trace of the state-flow graph going forward from edit.
+
+General principle: **a write to a state file is only durable if every concurrent writer is identified and either stopped or accepted.** "Accepted" is fine and often correct; "ignored" is the failure mode.
+
+### Side findings (not central but worth recording)
+
+- **Three broken alerting paths.** The 41-hour window happened because: (a) the daily_summary_tg.py cron is broken on a relative-path bug since file landed ~Apr 11 (19 days), (b) the real-time floor-hit TG alert IS plumbed correctly and DID land in chat 413342217 — but the 11:30 ping wasn't acted on, (c) no scheduled paper-PnL review existed. The alert worked; the operational response to the alert didn't. Fix queued separately for daily_summary_tg.py.
+
+- **AGENT.md / Handover doc-drift.** Both still described a single -$50 paper-PnL kill switch as the only gate, no mention of the bankroll floor or the daily tier system, ~16 days stale. AGENT.md fixed in 3e80e51 this session. CopyBot_Handover_CURRENT.md queued for evening routine per project rules.
+
+- **Paper-flat $10 mental model is wrong.** First post-restart signals fired at $1.10, not $10 — RULE23 NOISE_BET floor + INSIDER_HIGH bump in the downstream sizing pipeline. The "paper bets are flat $10" mental model from user memory is one input among several. Sizing-logic evaluation is its own future scope.
+
+- **Pre-committed eval criteria as defense against post-hoc reasoning.** CB-PAPER-PERFORMANCE-EVAL TODO (commit 218563a) commits the criteria before the data is looked at, defending against the same family as 2026-04-29's stacked-inference. Eval execution is a future session.
+
+- **Git path-relativity gate-string bug.** During the WORKSPACE-append block, the gate string used a path relative to the working directory while `git diff --cached --name-only` returns paths relative to repo root. Caused a false-positive ABORT — gate fired with wrong reasoning but right outcome (no commit-with-wrong-content, no index leak; recovery via `git reset HEAD` was robust to the gate-string bug itself). Pattern worth naming: gates can fail safely-by-construction when their failure mode produces an over-restrictive abort rather than an over-permissive pass-through.
+
+### What changed (commits)
+
+CopyBot repo (local, not pushed):
+- 0e04e45 — code: PAPER_REQUIRE_LIVE_BANKROLL flag + Option-A gate stanza
+- d31da14 — config: flip flag false in copy_config.json
+- e096706 — state: clear bankroll_floor_hit (raced the writer; reverted)
+- 6f0940a — revert: revert e096706 with race rationale
+- 3e80e51 — docs: AGENT.md kill-switch architecture update
+
+Brain repo (local, not pushed):
+- 70f6403 — scout: 14 SCT-AUTO entries from autonomous run (pre-staged at session start)
+- 218563a — WORKSPACE: queue CB-PAPER-PERFORMANCE-EVAL
+- e16b073 — WORKSPACE: queue CB-AGENT-MD-CURRENT-PHASE-REWRITE
+- (this entry's commit) — LESSONS: this entry
+
+### Forward implications
+
+- **Eval is now possible.** Paper signals flow under the new sizing reality. CB-PAPER-PERFORMANCE-EVAL has pre-committed criteria. Earliest eval date 2026-05-07.
+- **Live-flip is not on roadmap.** The decoupling structurally rejects "paper is a precursor to live." Live-flip becomes an open question dependent on eval outcome, not an inherited assumption.
+- **Three queued items from this session:** Handover doc-drift (tonight's evening routine), AGENT.md `## Current Phase` rewrite (CB-AGENT-MD-CURRENT-PHASE-REWRITE, future session), daily_summary_tg.py cron fix (separate session).
+
