@@ -481,3 +481,63 @@ WORKSPACE already had this queued at line ~105: "Polymarket exchange migration m
 
 This is the third instance in 36 hours of "incomplete trace of the dependency graph" failure — same family as 2026-04-29 "trace the consumer not just the producer" and 2026-04-30 "live-system-race state-edit." This one: traced the bug *within* the bot's code; the actual cause was upstream of the bot, in the SDK's spender-list behavior. The trace stopped at the codebase boundary. General principle: **dependency tracing must follow the call chain across project boundaries, not stop at "code I own."** Worth a LESSONS entry of its own in the next session, not folded into the CB-PAPER-HALT correction.
 
+
+---
+
+### CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS — settled-only metrics gameable by hold-to-resolution patterns (added 2026-04-30 evening)
+
+**Status:** finding committed, action partial.
+**Priority:** HIGH for CB-PAPER-PERFORMANCE-EVAL (modifies pass criteria); MEDIUM for routine wallet management.
+**Owner action required:** none tonight; CB-PAPER-PERFORMANCE-EVAL session must grapple with this before producing a verdict.
+
+#### Headline
+
+CopyBot's wallet scoring and paper-performance metrics are settled-only by design: WR, realized P&L, and expectancy are computed against `RESOLVED` events. Wallets with low `realized_ratio` (fraction of activity that has settled) can present strong settled-only metrics while their full position book is bleeding silently. Two confirmed exemplars in the watchlist:
+
+- **0x8a81855d (L20):** realized_ratio 0.47, profiler_resolved_pnl +$7,915, profiler_mtm_pnl −$8,835, net_pnl_onchain −$2,753. Resolved metrics show winner; full picture shows net negative.
+- **0xaa075924e1:** realized_ratio 0.11, resolved +$604K, MTM −$4.86M, 330 open positions. Earlier flagged as suspected martingale-class.
+
+Both wallets present as profitable on the metric we use to score them while being unambiguously net-negative when the open book is included.
+
+#### Why this matters for CB-PAPER-PERFORMANCE-EVAL
+
+The pre-committed eval criteria (commit 218563a) compute WR/expectancy on settled-only paper bets, n ≥ 100. If our paper bets are heavily sourced from low-realized-ratio wallets, the eval verdict could reproduce the same failure mode at the strategy level: a passing eval that masks an open-book disaster. **The eval session cannot be considered complete without addressing this.**
+
+#### Hard gate addition to CB-PAPER-PERFORMANCE-EVAL
+
+The eval session must additionally compute and evaluate, before producing any pass/fail verdict:
+
+1. **Source-wallet realized_ratio distribution.** Across all paper bets in the closed window, what fraction was sourced from wallets with realized_ratio < 0.5 at signal time? If > 30%, the eval is INCONCLUSIVE regardless of headline metrics.
+2. **Open-position MTM at eval time.** All open paper positions marked at last observed mid (which the criteria already require for drawdown). Compute paper-PnL-including-MTM, separately from settled-only PnL. Both must meet the PASS expectancy threshold (+$0.10/bet) for the eval to PASS. If settled-only passes but MTM-inclusive fails, verdict is INCONCLUSIVE.
+3. **Per-wallet contribution audit.** Top 10 wallets by paper-bet count: report each one's realized_ratio at signal time and at eval time. Surfaces silent shifts in source-wallet quality during the eval window.
+
+These gates are additions to the existing PASS/FAIL/INCONCLUSIVE thresholds, not replacements. All previously-pre-committed criteria (WR ≥ 52%, expectancy ≥ +$0.10, drawdown ≤ 30% of cumulative profit, open-window check) still apply.
+
+#### Wallet-management implication (separate from eval)
+
+Routine rescore (SCAN-7, Sundays) and TIER3 cycle (~2026-05-12) should treat realized_ratio < 0.5 as an **additional demote signal**, not a standalone trigger. The structural cousin pattern (high resolved-WR + large open book + low realized_ratio) is the actual concern. realized_ratio alone is noisy; combined with on-chain net negative, it's diagnostic.
+
+This is not a code change tonight. It's a heuristic the existing rescore machinery can incorporate when it next runs decisions.
+
+#### What this is not
+
+- Not a claim that all paper bets are bad. Wallets with realized_ratio ≥ 0.7 are fine to score on settled-only metrics.
+- Not a demand for a full re-architecture of wallet scoring. The COLD-path data sources (data-api/Gamma, unaffected by CB-V2-MIGRATION-FINDING) already expose open-position state; the change is in how we use it, not where we get it.
+- Not a falsification of the existing pre-committed eval criteria. It's an additive hard gate that must clear in addition to the existing thresholds.
+
+---
+
+### CB-MARTINGALE-WATCH-0x8a81855d — L20 deferral note (added 2026-04-30 evening)
+
+**Status:** considered, deferred. No watchlist write performed.
+
+n=58 verified against `data/sports_signals.jsonl` (37W/21L = 63.8% WR). Decline from 77.3% at n=22 is statistically significant (binomial test under H₀=0.773, p≈0.02). Paper PnL +$4.56. Bet-size sequence verified non-Martingale on our side (three flat regimes dictated by our sizing logic, not source-wallet imitation). Market coverage: 62 distinct markets, no concentration — sports specialist firing across niche fixtures.
+
+Considered demote 2026-04-30. **Deferred to SCAN-7 rescore (2026-05-03) and TIER3 cycle (~2026-05-12).** Reasons:
+
+- No operational consequence to deferral: paper-mode = $0 live risk, live-flip blocked by CB-V2-MIGRATION-FINDING regardless.
+- Routine machinery (Phase 3 min-gating, SCAN-7, TIER3) is designed for cohort-context decisions; one-off session-tail demotes accumulate inconsistency.
+- The underlying realized_ratio < 0.5 concern is now generalized as CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS (above) — addressing the system-level pattern is more durable than acting on this one wallet.
+
+If TIER3 cycle confirms degradation alongside the realized_ratio signal, demote then with full cohort context.
+
