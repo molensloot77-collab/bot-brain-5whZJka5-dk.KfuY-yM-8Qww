@@ -541,3 +541,20 @@ Considered demote 2026-04-30. **Deferred to SCAN-7 rescore (2026-05-03) and TIER
 
 If TIER3 cycle confirms degradation alongside the realized_ratio signal, demote then with full cohort context.
 
+
+---
+
+### CB-CRON-DAILY-SUMMARY-TG-FIX — relative-path cron bug fixed (added 2026-04-30 evening)
+
+**Status:** fixed.
+
+`/etc/cron.d/copybot-daily` invoked `python3 tools/daily_summary_tg.py` with a relative path. Cron runs as root with cwd `/root`, so Python looked for `/root/tools/daily_summary_tg.py`. Actual file: `/opt/copybot/tools/daily_summary_tg.py`. Broken since file landed in commit e49fe9d (~Apr 11) — 19 days of daily summaries silently failing. Visible in `/opt/copybot/logs/daily_summary.log` as `python3: can't open file '/root/tools/daily_summary_tg.py'` repeating once per night.
+
+Fix: prefixed the cron command with `cd /opt/copybot && ` to match the pattern used by every other CopyBot cron entry. Cron daemon picks up `/etc/cron.d/` changes automatically on file mtime; no reload needed.
+
+**Note:** `/etc/cron.d/` is system-level config, not in any tracked repo. This WORKSPACE entry is the only audit surface. Pre-fix snapshot at `/tmp/copybot-daily.pre_*` on the server. Next scheduled run: 22:00 UTC tonight.
+
+**This re-enables a Telegram alerting path that has been silent for 19 days.** Expected first ping in chat 413342217 at 22:00 UTC.
+
+**Caveat:** the fix only restores the cron's invocation. If `daily_summary_tg.py` itself has bugs that accumulated against an unobserved 19-day broken state (e.g., depends on schema that has since changed), the fix surfaces those bugs as new alert content. Watch the first ping.
+
