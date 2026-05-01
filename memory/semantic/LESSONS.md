@@ -812,3 +812,23 @@ Brain repo (local, not pushed):
 - **Live-flip is not on roadmap.** The decoupling structurally rejects "paper is a precursor to live." Live-flip becomes an open question dependent on eval outcome, not an inherited assumption.
 - **Three queued items from this session:** Handover doc-drift (tonight's evening routine), AGENT.md `## Current Phase` rewrite (CB-AGENT-MD-CURRENT-PHASE-REWRITE, future session), daily_summary_tg.py cron fix (separate session).
 
+
+### CORRECTION (2026-05-01) — premise of CB-PAPER-HALT was wrong
+
+The original entry above attributed the halt to "wallet had drained to $3.94." This is false. The wallet has been static at ~$66.78 (USDC.e $64.50 + USDC native $2.28 + MATIC) since 2026-04-25 01:17 UTC redemption — verified via on-chain check 2026-04-30. The $3.94 figure was the value py_clob_client's `get_balance_allowance(COLLATERAL)` returned, which we read as a balance reading. It was not.
+
+Actual cause: py_clob_client's `get_balance_allowance` started enumerating allowances against three spender contracts where it had previously enumerated one — two genuinely-new V2 spenders (`0xE111180000…` and `0xe2222d27…`) plus the long-known NegRisk Adapter (`0xd91E80cF…`). All three returned zero allowance because none had ever been approved against the operator wallet. The SDK summed the zero-allowance results and surfaced a near-zero "available" figure that the kill-switch read as a drained wallet.
+
+V1 allowances on this wallet are intact — ~$1M each on `0x4bFb41d5…` and `0xC5d563A3…` — but the SDK no longer surfaces them via `get_balance_allowance`. The SDK returns the union of new V2 spenders plus the Adapter, all zero. The wallet is not unapproved; it is invisible-to-this-SDK-call.
+
+The trigger was upstream of the bot, in the SDK's spender-list behavior, not in the protocol or the wallet state. "Protocol migrated" is also wrong — the V2 contracts have been live for some time; what changed was the SDK starting to query them.
+
+The architectural conclusion stands and is more clearly correct under the corrected premise:
+- Decoupling paper-mode from live-wallet readiness is the right move regardless of whether the wallet drains, the SDK changes, or the protocol migrates. The kill-switch was reading a live-wallet signal and using it to gate paper-mode signal generation. Paper-mode does not need a funded wallet to do its job.
+- The decoupling deployed at 2026-04-30 06:11:50 UTC remains correct. No revert needed.
+
+**Scope of this correction:** Only the Headline's stated cause ("wallet drained to $3.94") is falsified. The Three Findings, the family-this-sits-in framing, the Side-findings, and the Forward-implications in the original entry all stand. The architectural finding is not also falsified — if anything, it is strengthened by the corrected premise.
+
+Live-flip is structurally blocked until V2 spender re-approval — that gate is unchanged. Re-approval is a four-decisions-class action deferred until CB-PAPER-PERFORMANCE-EVAL passes.
+
+Reference: CB-V2-MIGRATION-FINDING in WORKSPACE (brain commit d145b2b) for the full reframe and chronology.
