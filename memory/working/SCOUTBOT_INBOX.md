@@ -173,11 +173,13 @@
 | SCT-AUTO-1096 | CopyBot | Add swisstony (0x204f72f35326db932158cba6adff0b9a1da95e14) to the harvester pipeline (`python3 harvester.py --add 0x2... | — | ACTIVE | — | 6.3 | 2026-05-01 |
 | SCT-AUTO-1097 | CopyBot | If category analysis reveals a high-ROI specialist niche, assess whether a category-gated copy trigger (analogous to ... | — | ACTIVE | — | 6.3 | 2026-05-01 |
 | SCT-AUTO-1098 | CopyBot | Add 0x1De39f5A4b1313B99fd5278036b2964cC03ca1fA to the harvester pipeline (`python3 harvester.py --add 0x1de39f5a4b131... | — | ACTIVE | — | 6.0 | 2026-05-01 |
-| SCT-AUTO-1099 | ALL | Review article methodology and assess whether the harvester's P&L ingestion pipeline needs a realized-vs-unrealized d... | — | ACTIVE | — | 5.4 | 2026-05-01 |
-| SCT-AUTO-1100 | ALL | Backtest whether accounting-memory bias explains CopyBot false positives on previously onboarded high-leaderboard wal... | — | ACTIVE | — | 5.4 | 2026-05-01 |
-| SCT-AUTO-1101 | ALL | If decomposition is feasible, add a realized-P&L filter as a pre-condition gate in the harvester qualification logic,... | — | ACTIVE | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1099 | ALL | Review article methodology and assess whether the harvester's P&L ingestion pipeline needs a realized-vs-unrealized d... | — | REJECTED | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1100 | ALL | Backtest whether accounting-memory bias explains CopyBot false positives on previously onboarded high-leaderboard wal... | — | REJECTED | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1101 | ALL | If decomposition is feasible, add a realized-P&L filter as a pre-condition gate in the harvester qualification logic,... | — | REJECTED | — | 5.4 | 2026-05-01 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
+
+**Status values:** ACTIVE (default on scout write), DONE (triage flipped to completed), REJECTED (triage flipped to rejected with rationale recorded in the Rejected section below).
 
 `| ID | Bot | Task | Priority | Status | Gate | Score | Added |`
 
@@ -315,3 +317,20 @@ SCT-AUTO-931 SCT-AUTO-932 SCT-AUTO-933 SCT-AUTO-934
 - Items NOT individually promoted: parked in place, considered reviewed; future sessions should treat 04-24 to 04-28 as already-triaged and only act on items dated 04-29 onwards.
 - Items requiring follow-up if reactivated: sort by score descending and pick from top.
 - Root cause of blind window: SCT-AUTO-1001 (broken Task 0 grep path); fixed 2026-04-28 via Standing pre-tasks section in /root/.agent/session_start_paste.md.
+
+## Rejected
+
+### SCT-AUTO-1099 — REJECTED 2026-05-01
+**Original task:** Review article methodology and assess whether the harvester's P&L ingestion pipeline needs a realized-vs-unrealized decomposition.
+**Rationale:** Cited article ("Investment Memory: Why Most Portfolio Systems Lie to You", quantjourney.substack.com) does not bridge to CopyBot's domain. Article addresses institutional Portfolio Management Systems — IBOR vs ABOR, bitemporal storage, the pro-forma-backtest trap. It does not address third-party wallet P&L, realized-vs-unrealized as a scoring filter, or anything mappable to copy-trading false positives. The realized-vs-unrealized decomposition direction itself has independent merit via CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS (WORKSPACE 2026-04-30 evening), but is not justified by this source.
+**Lesson:** scout-summary-overreach (LESSONS commit `e7cebc8`)
+
+### SCT-AUTO-1100 — REJECTED 2026-05-01
+**Original task:** Backtest whether accounting-memory bias explains CopyBot false positives on previously onboarded high-leaderboard wallets.
+**Rationale:** "Accounting-memory bias" is a framing the scout invented; the cited article does not use the term and does not define a phenomenon mappable to copy-trading false positives. False positives on high-leaderboard wallets are explained by hold-to-resolution patterns hiding MTM losses (the 0xaa075924e1 martingale-class case), a mechanism unrelated to the article's pro-forma-backtest critique. Backtesting the wrong-named hypothesis would not produce useful signal.
+**Lesson:** scout-summary-overreach (LESSONS commit `e7cebc8`)
+
+### SCT-AUTO-1101 — REJECTED 2026-05-01
+**Original task:** Add a realized-P&L filter as a pre-condition gate in the harvester qualification logic.
+**Rationale:** The proposal itself has merit and pairs with CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS's downstream gate (upstream qualification + downstream scoring as complementary defenses). Rejected here only because the citation chain (this article justifies this filter) is not valid. If the qualification-gate filter is implemented, it should be tracked under CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS in WORKSPACE, not as a derivative of this scout entry.
+**Lesson:** scout-summary-overreach (LESSONS commit `e7cebc8`)
