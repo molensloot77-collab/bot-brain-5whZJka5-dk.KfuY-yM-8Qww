@@ -832,3 +832,28 @@ The architectural conclusion stands and is more clearly correct under the correc
 Live-flip is structurally blocked until V2 spender re-approval — that gate is unchanged. Re-approval is a four-decisions-class action deferred until CB-PAPER-PERFORMANCE-EVAL passes.
 
 Reference: CB-V2-MIGRATION-FINDING in WORKSPACE (brain commit d145b2b) for the full reframe and chronology.
+
+## 2026-05-01 — dependency-tracing-across-project-boundaries
+
+When tracing the cause of a behavior change, the call chain crosses project boundaries. Stopping at "code I own" is the failure mode.
+
+Yesterday (2026-04-30 evening): CopyBot's kill-switch fired on a near-zero balance figure. Tracing within the bot's code surfaced no recent changes to the kill-switch logic, no changes to the balance check, no changes to the polling cadence. The bot looked clean and was clean. The cause was upstream — py_clob_client's `get_balance_allowance` had started querying three spender contracts where it had previously queried one. The behavior change was real and material, but it was not in code we own. It was in the SDK's spender-list behavior.
+
+The dependency graph for any non-trivial system extends through:
+- Vendored libraries and SDKs (py_clob_client, web3, etc.) — these update independently and can change behavior without API surface changes
+- Protocol contracts — V2 contracts existed for some time; what changed was when the SDK started querying them
+- System services — cron, systemd, the kernel's network stack
+- External APIs — Polymarket's CLOB endpoints, Gamma, Telegram
+
+A dependency trace that stops at the boundary of code-you-own will miss any cause that lives upstream. The defense is not "audit every dependency every time" — that's intractable. The defense is: when the in-house trace finds nothing and the behavior is real, the next move is to widen the trace, not to declare the behavior unexplained.
+
+Operationally:
+- For SDK behavior changes: check the SDK's recent commits and the version installed against the version that was running before the behavior change.
+- For protocol behavior: check whether the contracts being queried changed, OR whether the set of contracts being queried changed (this was the V2 case — same contracts, larger query set).
+- For "the bot looks clean": treat that as a signal to widen, not a signal to close the investigation.
+
+Companion lessons:
+- 2026-04-29 trace-the-consumer-not-just-the-producer (within-bot, across modules)
+- 2026-04-30 morning live-system-race-state-edit (within-bot, across processes)
+
+This entry is the cross-boundary case specifically. The within-bot cases are covered by the two companion lessons above. The shared root across all three is incomplete dependency-graph trace, but the failure modes and the defenses differ at each layer.
