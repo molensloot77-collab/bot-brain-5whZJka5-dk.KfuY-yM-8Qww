@@ -148,6 +148,34 @@
 | SCT-AUTO-1071 | CopyBot | Add 11122 (0x011f2d377e56119fb09196dffb0948ae55711122) to the harvester pipeline at low priority; pull trade history ... | — | ACTIVE | — | 5.4 | 2026-04-30 |
 | SCT-AUTO-1072 | CopyBot | Audit Struct API field coverage (PnL granularity, position history depth, activity timestamps) against the current `p... | — | ACTIVE | — | 5.2 | 2026-04-30 |
 | SCT-AUTO-1073 | CopyBot | Add AV23IUa (0xdb859a551fcf56e49416160911476bea7307152f) to the harvester pipeline at low priority; use the 11.2% ROI... | — | ACTIVE | — | 5.2 | 2026-04-30 |
+| SCT-AUTO-1074 | CopyBot | Integrate GhostGuard into CopyBot's post-execution monitoring layer immediately after `paper_execute()` CLOB fill con... | — | ACTIVE | — | 8.7 | 2026-05-01 |
+| SCT-AUTO-1075 | CopyBot | Implement ghost fill detection within the existing position tracker to flag RULE 22 contradictions where tracked posi... | — | ACTIVE | — | 8.7 | 2026-05-01 |
+| SCT-AUTO-1076 | CopyBot | Backtest GhostGuard detection logic against historical CopyBot trade logs to quantify fill authenticity rate and esta... | — | ACTIVE | — | 8.7 | 2026-05-01 |
+| SCT-AUTO-1077 | CopyBot | Pull archived wallet address from the linked tweet thread and add bin8888 to the harvester pipeline immediately; conf... | — | ACTIVE | — | 7.9 | 2026-05-01 |
+| SCT-AUTO-1078 | CopyBot | Monitor the anonymized wallet for continued oil-market activity; if active trading persists post-anonymization, asses... | — | ACTIVE | — | 7.9 | 2026-05-01 |
+| SCT-AUTO-1079 | CopyBot | If bin8888 qualifies for active mirroring, define a commodity-market MIN_PRICE gate variant accounting for oil market... | — | ACTIVE | — | 7.9 | 2026-05-01 |
+| SCT-AUTO-1080 | CopyBot | Add 0xcf609d3256f0f37f0595e5dc64012fa3a8fea6f5 to the harvester pipeline immediately (`python3 harvester.py --add 0xc... | — | ACTIVE | — | 7.4 | 2026-05-01 |
+| SCT-AUTO-1081 | CopyBot | Define position-sizing guards for mirroring this wallet given its small capital base (~$13k volume); assess whether C... | — | ACTIVE | — | 7.4 | 2026-05-01 |
+| SCT-AUTO-1082 | CopyBot | Identify and archive the wallet list for the BTC Up/Down bot cluster (412 wallets); pull on-chain trade history for t... | — | ACTIVE | — | 7.3 | 2026-05-01 |
+| SCT-AUTO-1083 | CopyBot | Stress-test the claimed 0.6–0.9% per-capture edge against historical Polymarket BTC Up/Down market spreads and the cu... | — | ACTIVE | — | 7.3 | 2026-05-01 |
+| SCT-AUTO-1084 | CopyBot | Assess distributional integrity of the 412-wallet cluster — determine whether top-performer 9% ROI is genuinely conce... | — | ACTIVE | — | 7.3 | 2026-05-01 |
+| SCT-AUTO-1085 | CopyBot | Add rebotsliaf (0x206191d01c411a5b346d11a2df2d463a356b8ec9) to the harvester pipeline (`python3 harvester.py --add 0x... | — | ACTIVE | — | 7.0 | 2026-05-01 |
+| SCT-AUTO-1086 | CopyBot | Apply the same position-sizing guard assessment used for 0xcf609d32 (SCT-AUTO-1081) to rebotsliaf given comparable sm... | — | ACTIVE | — | 7.0 | 2026-05-01 |
+| SCT-AUTO-1087 | CopyBot | Add cryptoaxel to the harvester pipeline (`python3 harvester.py --add cryptoaxel`); resolve on-chain wallet address, ... | — | ACTIVE | — | 6.6 | 2026-05-01 |
+| SCT-AUTO-1088 | CopyBot | If cryptoaxel qualifies for mirroring, define a Dogecoin-market-specific copy gate scoping CopyBot triggers exclusive... | — | ACTIVE | — | 6.6 | 2026-05-01 |
+| SCT-AUTO-1089 | CopyBot | Validate distributional integrity of the 100% accuracy claim — determine whether it reflects a small sample of trades... | — | ACTIVE | — | 6.6 | 2026-05-01 |
+| SCT-AUTO-1090 | ALL | Review PaulieB14/polymarket-orderbook-substreams indexing schema for compatibility with py_clob_client stream handler... | — | ACTIVE | — | 6.5 | 2026-05-01 |
+| SCT-AUTO-1091 | ALL | Benchmark end-to-end Substreams delivery latency against current REST polling baseline on MON-30 flow spike detection... | — | ACTIVE | — | 6.5 | 2026-05-01 |
+| SCT-AUTO-1092 | ALL | Test orderbook skew metrics from the Substreams schema as candidate inputs to INSIDER_SPIKE and STAT_ANOMALY gates; d... | — | ACTIVE | — | 6.5 | 2026-05-01 |
+| SCT-AUTO-1093 | CopyBot | Resolve full wallet address from 0xb91 truncation and pull on-chain trade history to confirm $129,844 P&L and trade t... | — | ACTIVE | — | 6.3 | 2026-05-01 |
+| SCT-AUTO-1094 | CopyBot | Use the 0xb91 trade profile (single-event spike, magnitude, timing delta vs. public announcement) as a calibration in... | — | ACTIVE | — | 6.3 | 2026-05-01 |
+| SCT-AUTO-1095 | CopyBot | Monitor 0xb91 for subsequent trading activity — if post-event behavior reveals a repeatable non-insider pattern with ... | — | ACTIVE | — | 6.3 | 2026-05-01 |
+| SCT-AUTO-1096 | CopyBot | Add swisstony (0x204f72f35326db932158cba6adff0b9a1da95e14) to the harvester pipeline (`python3 harvester.py --add 0x2... | — | ACTIVE | — | 6.3 | 2026-05-01 |
+| SCT-AUTO-1097 | CopyBot | If category analysis reveals a high-ROI specialist niche, assess whether a category-gated copy trigger (analogous to ... | — | ACTIVE | — | 6.3 | 2026-05-01 |
+| SCT-AUTO-1098 | CopyBot | Add 0x1De39f5A4b1313B99fd5278036b2964cC03ca1fA to the harvester pipeline (`python3 harvester.py --add 0x1de39f5a4b131... | — | ACTIVE | — | 6.0 | 2026-05-01 |
+| SCT-AUTO-1099 | ALL | Review article methodology and assess whether the harvester's P&L ingestion pipeline needs a realized-vs-unrealized d... | — | ACTIVE | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1100 | ALL | Backtest whether accounting-memory bias explains CopyBot false positives on previously onboarded high-leaderboard wal... | — | ACTIVE | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1101 | ALL | If decomposition is feasible, add a realized-P&L filter as a pre-condition gate in the harvester qualification logic,... | — | ACTIVE | — | 5.4 | 2026-05-01 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
