@@ -857,3 +857,27 @@ Companion lessons:
 - 2026-04-30 morning live-system-race-state-edit (within-bot, across processes)
 
 This entry is the cross-boundary case specifically. The within-bot cases are covered by the two companion lessons above. The shared root across all three is incomplete dependency-graph trace, but the failure modes and the defenses differ at each layer.
+
+## 2026-05-01 — scout-summary-overreach as stacked-inference vector
+
+ScoutBot's inbox entries are editorial layers above source artifacts. The pipeline is: source article → scout reads and scores → scout writes a summary + draft_todos → editorial expansion into inbox-table rows. Each step is an inference. Treating the inbox row as a finding skips three layers of verification.
+
+Today: SCT-AUTO 1099-1101 cited "Investment Memory: Why Most Portfolio Systems Lie to You" (quantjourney.substack.com) as justification for a realized-vs-unrealized decomposition in CopyBot's harvester. The scout's summary called it "quantitative analysis on portfolio P&L reporting bias and accounting memory effects." The article is in fact about institutional Portfolio Management Systems — IBOR vs ABOR, bitemporal storage, and the pro-forma-backtest trap. It does not address third-party wallet P&L, realized-vs-unrealized as a scoring filter, or anything mappable to copy-trading false positives. The bridge from article to harvester change does not exist; the scout invented "accounting-memory bias" as a framing the article does not use.
+
+The harvester change itself (realized-P&L filter as qualification gate) has independent merit via CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS, which was derived from on-chain wallet-level evidence. The article was not the basis. Citing the article as basis would have created a paper trail to a nonexistent justification.
+
+This is the third stacked-inference finding in 36 hours:
+- 2026-04-29 stacked-inference family (within-bot reasoning chains)
+- 2026-04-30 evening CB-PAPER-HALT wrong-premise (within-session reasoning on noisy SDK output)
+- 2026-05-01 scout-summary-overreach (cross-actor editorial layer)
+
+The shared root is using a downstream summary as if it were the source. The previous two cases lived inside the bot's code or inside a single session's reasoning. This one crosses an actor boundary — the scout is a separate process that produces artifacts the chat session consumes. The defense is the same shape as dependency-tracing-across-project-boundaries: when a summary is load-bearing for a decision, the source must be checked. "The scout said" is not a source; it is a citation to a citation.
+
+Contagion note: this failure mode is not located in the scout. Today's session produced two layers of overreach — the scout's summary in the inbox, and the chat session's "structural confirmation" comparison table that took the scout's framing as established and built a merge proposal on top of it. Both happened before the article was fetched. The pattern is: when an upstream summary aligns plausibly with a known finding, the alignment itself feels like verification. It is not. Plausibility is the lure; source-check is the defense.
+
+Operationally:
+- Scout inbox rows are recon prompts, not findings. The full body in scored_inbox.jsonl is one layer below the row; the source artifact is the layer that matters.
+- Before merging a scout-cited finding into WORKSPACE or building on it in code, fetch the source and verify the scout's summary against it.
+- When a session's analysis builds on a scout summary without source-fetch, name that as a precondition the analysis rests on. If the precondition fails, the analysis falls with it.
+
+Companion lesson: 2026-05-01 dependency-tracing-across-project-boundaries (cross-boundary case for code/SDK; this entry is the cross-boundary case for editorial-layer artifacts).
