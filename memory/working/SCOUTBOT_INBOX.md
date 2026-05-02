@@ -176,6 +176,33 @@
 | SCT-AUTO-1099 | ALL | Review article methodology and assess whether the harvester's P&L ingestion pipeline needs a realized-vs-unrealized d... | — | REJECTED | — | 5.4 | 2026-05-01 |
 | SCT-AUTO-1100 | ALL | Backtest whether accounting-memory bias explains CopyBot false positives on previously onboarded high-leaderboard wal... | — | REJECTED | — | 5.4 | 2026-05-01 |
 | SCT-AUTO-1101 | ALL | If decomposition is feasible, add a realized-P&L filter as a pre-condition gate in the harvester qualification logic,... | — | REJECTED | — | 5.4 | 2026-05-01 |
+| SCT-AUTO-1102 | CopyBot | Add PDJ88 (0x0e1d01759cfa75782134472a7af5963da9d50c53) to the harvester pipeline (`python3 harvester.py --add 0x0e1d0... | — | ACTIVE | — | 7.8 | 2026-05-02 |
+| SCT-AUTO-1103 | CopyBot | Assess whether PDJ88's low absolute volume (~$20K) creates meaningful capacity constraints for mirroring — determine ... | — | ACTIVE | — | 7.8 | 2026-05-02 |
+| SCT-AUTO-1104 | CopyBot | Add RisottoPasta (0x49f206f4fb2210a28af4795e4e0b6532cf0bd7b4) to the harvester pipeline (`python3 harvester.py --add ... | — | ACTIVE | — | 6.8 | 2026-05-02 |
+| SCT-AUTO-1105 | CopyBot | Identify the wallet behind the MegaETH launch date prediction — cross-reference Polymarket leaderboard and MegaETH la... | — | ACTIVE | — | 6.7 | 2026-05-02 |
+| SCT-AUTO-1106 | CopyBot | Once wallet is identified, run `python3 harvester.py --add {wallet}` to confirm on-chain P&L and volume; apply realiz... | — | ACTIVE | — | 6.7 | 2026-05-02 |
+| SCT-AUTO-1107 | CopyBot | If validation passes, assess whether a category gate scoped to launch-date and event-timing markets would isolate the... | — | ACTIVE | — | 6.7 | 2026-05-02 |
+| SCT-AUTO-1108 | ALL | Audit current order execution paths across PolyArb, CopyBot, WeatherBot, and KrajekBot against the py-builder-relayer... | — | ACTIVE | — | 6.6 | 2026-05-02 |
+| SCT-AUTO-1109 | ALL | Run load and failure-mode testing on the relayer API via the client — measure p50/p99 submission latency, characteriz... | — | ACTIVE | — | 6.6 | 2026-05-02 |
+| SCT-AUTO-1110 | CopyBot | Archive the full tweet content and any disclosed terminal settings or detection criteria before the claimed 24-hour d... | — | ACTIVE | — | 6.4 | 2026-05-02 |
+| SCT-AUTO-1111 | CopyBot | Cross-reference any disclosed detection logic against CopyBot's MON-30 flow spike detection and `check_anomaly()` imp... | — | ACTIVE | — | 6.4 | 2026-05-02 |
+| SCT-AUTO-1112 | CopyBot | Attempt independent validation of the claimed 0–5 wallets/day hit rate by running the harvester across recent high-fl... | — | ACTIVE | — | 6.4 | 2026-05-02 |
+| SCT-AUTO-1113 | NewsBot | Survey active Polymarket markets with oil/energy exposure (conflict, OPEC, sanctions, macro) and assess whether WTI f... | — | ACTIVE | — | 5.9 | 2026-05-02 |
+| SCT-AUTO-1114 | NewsBot | If SCT-AUTO-1113 surfaces viable categories, implement an 'oil exposure' tag in NewsBot's event classification pipeli... | — | ACTIVE | — | 5.9 | 2026-05-02 |
+| SCT-AUTO-1115 | ALL | Review MemePit's viral-attention signal logic and assess whether Kalshi meme-market volume/velocity patterns are obse... | — | ACTIVE | — | 5.6 | 2026-05-02 |
+| SCT-AUTO-1116 | CopyBot | Run `python3 harvester.py --add 0x492442eab586f242b53bda933fd5de859c8a3782` to pull on-chain P&L and volume; apply re... | — | ACTIVE | — | 5.6 | 2026-05-02 |
+| SCT-AUTO-1117 | CopyBot | If SCT-AUTO-1116 validates the edge, profile market category distribution across this wallet's trade history to deter... | — | ACTIVE | — | 5.6 | 2026-05-02 |
+| SCT-AUTO-1118 | CopyBot | Run `python3 harvester.py --add 0x986b16df5791e7dc4c6f6ef3524eff0efe6812e9` to pull on-chain P&L and volume; apply re... | — | ACTIVE | — | 5.6 | 2026-05-02 |
+| SCT-AUTO-1119 | ALL | Review rs-clob-client-v2 source and open issues for any undocumented CLOB API behaviors, rate limit details, or order... | — | ACTIVE | — | 5.4 | 2026-05-02 |
+| SCT-AUTO-1120 | CopyBot | Run `python3 harvester.py --add 0xdc40c985063d50aa00cc5f637f7e83203b3b89cf` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.2 | 2026-05-02 |
+| SCT-AUTO-1121 | CopyBot | Run `python3 harvester.py --add 0x47b3badd653cc86c4d24a66712e58818b235039c` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.2 | 2026-05-02 |
+| SCT-AUTO-1122 | CopyBot | Run `python3 harvester.py --add 0xfdc0bd67fbd71aa8edd00121eb2a7fcbddc34b85` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.2 | 2026-05-02 |
+| SCT-AUTO-1123 | CopyBot | Run `python3 harvester.py --add 0x37d366a769f58ef478f72c6b1bf730424b2b709a` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1124 | CopyBot | Run `python3 harvester.py --add 0x27abdfc9393c72a6330a3be987da4b46c726e521` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1125 | CopyBot | Run `python3 harvester.py --add 0x23073ad0c9dff45353cedb11760570b995663934` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1126 | CopyBot | Run `python3 harvester.py --add 0xa113d92c8bdd65c4f7e47a086a24ae3b125c284e` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1127 | CopyBot | Run `python3 harvester.py --add 0x64e93f87d8a0c1b2cde6f20d71f211372a95eb4c` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1128 | CopyBot | Run `python3 harvester.py --add 0xc0ff6a9ac424210cf218fda5c5753324c34a9953` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
