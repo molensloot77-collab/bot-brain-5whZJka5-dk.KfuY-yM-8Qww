@@ -59,3 +59,59 @@ eval-scope subset 1,691-1,715 RESOLVED depending on choice in item 1).
 Preview verdict: INCONCLUSIVE on both filter choices.
 
 Schema reference for the source file: `memory/semantic/sports_signals_schema.md`.
+
+### CORRECTION (2026-05-02 same session) — preview-scan was misframed
+
+The original note's "2026-05-02 preview-scan" numbers were filtered on
+`placed_at >= 2026-04-17` with no upper bound, conflating the closed
+and open windows (which the eval block treats as "separate samples, not
+concatenated"). The misframed read combined ~24% open-window data into
+the closed-window primary, pulling the headline materially toward
+break-even.
+
+**Recomputed against the same snapshot, scoped correctly:**
+
+**CLOSED WINDOW** (primary; `placed_at` in `[2026-04-17, 2026-04-28 11:30:17]`)
+- n = 1,286 RESOLVED
+- WR = 49.84%
+- expectancy = -$0.0314/bet
+- cumulative P&L = -$40.33
+- max drawdown = $72.81
+- drawdown ratio: undefined (cum ≤ 0; item 2 case is no longer hypothetical)
+- Verdict band: INCONCLUSIVE, but expectancy is ~63% of the way from the
+  inconclusive zone to the FAIL line (-$0.05). The misframed expectancy of
+  -$0.0090 was 3.5x less negative than the truth.
+
+**OPEN WINDOW** (secondary; `placed_at >= 2026-04-30 06:11:51`)
+- n = 405 RESOLVED (early; only ~2 days of data at preview time)
+- WR = 53.33%
+- expectancy = +$0.0619/bet
+- cumulative P&L = +$25.05
+- max drawdown = $17.27
+- drawdown ratio: 68.9% of cum profit — FAILS the 30%-of-profit drawdown
+  criterion if applied to this window
+- Open-vs-closed degradation check passes on direction (open WR 53.33%
+  above closed CI ~[47.0%, 52.6%])
+
+The two windows do not corroborate on direction: closed-window primary
+trends toward FAIL on expectancy; open-window secondary is positive on
+expectancy but fails the drawdown criterion. By 2026-05-07 the open
+window will have meaningfully more data (~1,000+ RESOLVED expected) and
+the picture may resolve, but the eval session should walk in expecting
+the verdict to be harder to land cleanly than the misframed preview
+suggested.
+
+Items 1-3 above are confirmed by the recomputed numbers:
+- **Item 1** (timestamp field): the original misframe was actually a
+  `placed_at`-vs-window-bound issue, not a `placed_at`-vs-`ts` issue.
+  The underlying point that filter choice can mass-shift ~24% of the
+  eval corpus is reinforced. Item 1 still needs explicit pre-commit.
+- **Item 2** (drawdown under negative cumulative): the closed window is
+  in this case right now (cum = -$40.33). Item 2 is no longer hypothetical.
+- **Item 3** (blindspot gates): unchanged — still a genuine conflict with
+  the eval block's "per-wallet out of scope" line. The closer-to-FAIL
+  closed-window read makes resolving this conflict more consequential,
+  not less.
+
+Source: 2026-05-02 corrected scan, same session, same snapshot
+(`/tmp/sports_signals_b1.jsonl`).
