@@ -203,6 +203,15 @@
 | SCT-AUTO-1126 | CopyBot | Run `python3 harvester.py --add 0xa113d92c8bdd65c4f7e47a086a24ae3b125c284e` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
 | SCT-AUTO-1127 | CopyBot | Run `python3 harvester.py --add 0x64e93f87d8a0c1b2cde6f20d71f211372a95eb4c` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
 | SCT-AUTO-1128 | CopyBot | Run `python3 harvester.py --add 0xc0ff6a9ac424210cf218fda5c5753324c34a9953` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 5.0 | 2026-05-02 |
+| SCT-AUTO-1129 | CopyBot | Run `python3 harvester.py --add 0x45c9c799e0e6ddf19c50e9dac5ab5a925f9b414b` to pull on-chain P&L; apply realized-vs-u... | — | ACTIVE | — | 6.7 | 2026-05-03 |
+| SCT-AUTO-1130 | ALL | Review Mamba attention mechanism applicability to ScoutBot multi-signal aggregation (news event → confidence scoring)... | — | ACTIVE | — | 6.1 | 2026-05-03 |
+| SCT-AUTO-1131 | ALL | Assess whether SAMBA's graph component can model correlated Polymarket markets (e.g., related political events) to im... | — | ACTIVE | — | 6.1 | 2026-05-03 |
+| SCT-AUTO-1132 | CopyBot | Analyze entry/exit trigger logic for news-signal latency and slippage against CopyBot's MIN_PRICE/MAX_PRICE gate; det... | — | ACTIVE | — | 5.5 | 2026-05-03 |
+| SCT-AUTO-1133 | CopyBot | Cross-reference Alpaca execution fee model with Polymarket/Kalshi fee structures; confirm whether SX odds checker equ... | — | ACTIVE | — | 5.5 | 2026-05-03 |
+| SCT-AUTO-1134 | CopyBot | Evaluate copy-trade confidence threshold implementation against CopyBot MON-36 contradiction guard; flag any threshol... | — | ACTIVE | — | 5.5 | 2026-05-03 |
+| SCT-AUTO-1135 | ALL | Evaluate arbitrage scanner patterns for structural reuse in PolyArb's oracle-lag detection or CopyBot's SX Bet cross-... | — | ACTIVE | — | 5.2 | 2026-05-03 |
+| SCT-AUTO-1136 | ALL | Audit Limitless Exchange API against py_clob_client interface; determine whether a thin adapter layer is sufficient f... | — | ACTIVE | — | 5.2 | 2026-05-03 |
+| SCT-AUTO-1137 | CopyBot | Run `python3 harvester.py --add 0xf6f687d9c728a4fc5590d71e2e53b9d418e20e74` to establish on-chain baseline; defer ROI... | — | ACTIVE | — | 5.1 | 2026-05-03 |
 
 ## Schema (preserved from AllBots_TODO_CURRENT.md format)
 
