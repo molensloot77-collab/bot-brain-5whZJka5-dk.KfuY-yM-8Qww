@@ -387,6 +387,18 @@ Anything else, including: 42% < WR < 52%, expectancy in (−$0.05, +$0.10), n < 
 
 Separate session, ~30-60 min. Reads `/opt/copybot/data/sports_signals.jsonl`, computes metrics, applies thresholds, produces verdict + WORKSPACE update. Earliest date 2026-05-07 to give open-window ≥7 days.
 
+#### Pre-execution open items (added 2026-05-03)
+
+Three items must be resolved before the 2026-05-07 eval session runs. Eval session reads `memory/working/eval_precommit_clarifications_20260502.md` (commit `3745237`) AND its corrigendum (commit `6535833`) as required pre-reading, in that order — the corrigendum corrects a misframe in the original; reading only the original yields wrong numbers.
+
+**1. Timestamp field for window scoping.** Pre-commit note documents the `placed_at` vs `ts` filter choice (24-event delta on the closed window). Methodologically load-bearing for borderline runs. Use `placed_at` per the corrigendum's recomputation; document choice in the eval write-up.
+
+**2. Drawdown rule when cumulative ≤ 0.** No longer hypothetical. Closed-window preview cum is -$40.33; the standard "drawdown ratio = max_dd / cum_profit" is undefined when cum ≤ 0. Pre-commit note proposes resolution; eval session ratifies and applies.
+
+**3. Blindspot additive gates — CONTRADICTION with this block.** Pre-commit note Item 3 specifies additive eval gates from CB-METRICS-BLINDSPOT-OPEN-BOOK-WALLETS (per-wallet realized_ratio audit as hard gate). This block's `#### Out of scope` declares "Per-wallet performance (handled by Phase 3 cadence, not strategy-level eval)." These cannot both stand. Contradiction predates 2026-05-02 session — not introduced by it, but surfaced by it. **Resolution likely requires BigW direct authorization** because a verdict that demands per-wallet redesign vs one that defers per-wallet to Phase 3 cadence are different four-decisions-class outcomes. Resolve before eval execution.
+
+**Closed-window preview signal (corrigendum recomputation).** Under correct closed-window bounds (`placed_at` in [2026-04-17, 2026-04-28 11:30:17 UTC], block-defined primary): n=1,286 RESOLVED, WR 49.84%, expectancy **-$0.0314/bet** (FAIL line is -$0.05; preview is ~63% of the way there), cum P&L -$40.33, max drawdown $72.81. Verdict band INCONCLUSIVE on the n>=100 floor, **but trending toward FAIL on expectancy** — the eval session walks in expecting a non-PASS verdict more likely than the original pre-commit anticipated. Open window (n=405, WR 53.33%, exp +$0.0619) does not corroborate closed window on direction; corroboration check is itself an open methodological question for the eval session.
+
 
 ---
 
