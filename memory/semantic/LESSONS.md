@@ -881,3 +881,28 @@ Operationally:
 - When a session's analysis builds on a scout summary without source-fetch, name that as a precondition the analysis rests on. If the precondition fails, the analysis falls with it.
 
 Companion lesson: 2026-05-01 dependency-tracing-across-project-boundaries (cross-boundary case for code/SDK; this entry is the cross-boundary case for editorial-layer artifacts).
+
+## 2026-05-03 — narrative-summary-vs-operational-definition (stacked-inference family, fourth filing)
+
+**Failure mode.** When doing a fresh-eyes pass on a pre-committed criteria document (eval block, gate definition, threshold spec), the load-bearing read is the *operational definition* — the explicit block bounds, the named thresholds, the enumerated conditions. The *narrative summary* of those same criteria, even when it lives in the same document or in our own session memory, is shorthand. Computing on the shorthand produces numbers that pattern-match correct without being correct.
+
+**Concrete instance (2026-05-02).** A preview-scan of CB-PAPER-PERFORMANCE-EVAL was filed mid-session against `placed_at >= 2026-04-17` with no upper bound, derived from the WORKSPACE narrative phrase "post-Apr-17 paper-mode." That phrase is technically true but is a summary — the eval block itself defines a closed window with an explicit halt-bounded upper (`placed_at` in [2026-04-17, 2026-04-28 11:30:17 UTC]) and a separate open window with an explicit lower (`placed_at >= 2026-04-30 06:11:51 UTC`). The misframed scan returned n=1,691 / n=1,715 (depending on `placed_at` vs `ts`), conflating the two windows. The corrigendum recomputed under the operational bounds and got n=1,286 / WR 49.84% / expectancy −$0.0314 — material verdict shift (INCONCLUSIVE-but-trending-FAIL versus the original "essentially break-even" read).
+
+The original note was filed during a session that had been running cleanly. The misframe was not careless work; it was the result of treating a summary as the contract and computing on it.
+
+**Why this is a distinct filing in the stacked-inference family.**
+
+Three prior entries have addressed adjacent failure modes:
+- *2026-04-30 CB-PAPER-HALT (correction 2026-05-01)*: a date inferred from one document was contradicted by another. Different documents, conflicting facts.
+- *2026-05-01 dependency-tracing-across-project-boundaries*: task scope inferred from local context missed a cross-project ramification. Wrong document scope.
+- *2026-05-01 scout-summary-overreach as stacked-inference vector*: a summary read as authoritative when source data was the contract. Same document family, but summary lived externally to the source.
+
+This filing names a tighter case: the summary and the operational definition lived **in the same document**. The misframe was not "I read the wrong document," it was "I read the convenient passage of the right document." The convenience was the trap — the narrative summary was easier to act on than the operational block, and it appeared sufficient.
+
+**Operational rule.** When doing a load-bearing read against pre-committed criteria, the operational definition is the authoritative source — not any narrative summary, even one in the same document or one authored by us. Read the operational block. Compute on its explicit bounds. If reaching for a passage that summarizes the criteria rather than defines them, treat that as a signal to find the definition.
+
+**Corollary: on-a-roll-cascade is the same failure in a different costume.** The session-end "one more thing" pattern that ambushed 2026-05-02 (extending past stop-or-continue, the extension surfacing an error in earlier on-roll work) shares a root cause with the misframe: *I am being efficient by not re-reading the source.* The misframe applied that motion to a fresh-eyes scan. The on-a-roll-cascade applies it to session-end extension. Both produce work that pattern-matches correct without being correct. The correction is the same motion in reverse: re-read the source, especially when the convenient summary or the on-a-roll feeling makes re-reading feel redundant.
+
+**Test: would this rule have caught yesterday's misframe?** Yes. Reading the operational block first would have surfaced both window bounds explicitly, and the closed-window upper would have prevented conflating it with the open window. The rule is operational, not aspirational.
+
+**Cross-references in the stacked-inference family.** Read together for the full pattern: 2026-04-30 CB-PAPER-HALT (with 2026-05-01 correction), 2026-05-01 dependency-tracing-across-project-boundaries, 2026-05-01 scout-summary-overreach. This entry (2026-05-03) is the fourth.
